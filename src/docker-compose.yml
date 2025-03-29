@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - UVICORN_HOST=0.0.0.0
+    restart: always
+
+  frontend:
+    build: ./frontend/LocalArchive
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    restart: always
