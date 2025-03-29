@@ -9,6 +9,9 @@ services:
       - ./backend:/app
     environment:
       - UVICORN_HOST=0.0.0.0
+      - DATABASE_URL=postgresql://user:password@db:5432/mydatabase  # Zmienna środowiskowa dla FastAPI
+    depends_on:
+      - db
     restart: always
 
   frontend:
@@ -18,3 +21,18 @@ services:
     depends_on:
       - backend
     restart: always
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+volumes:
+  postgres_data:
