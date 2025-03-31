@@ -1,0 +1,9 @@
+<div class="formDiv">
+  <img src="../../../../assets/appLogo.jpg" alt="logo">
+  <span>Login:</span>
+  <input type="text" placeholder="email" [(ngModel)]="username" />
+  <span>Hasło:</span>
+  <input type="password" placeholder="hasło" [(ngModel)]="password" />
+  <button class = 'loginButton' (click)="navigateTo('/main')">Zaloguj się</button>
+  <button class = 'loginButton'>Zarejestruj się</button>
+</div>
