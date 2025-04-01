@@ -18,3 +18,22 @@ resource "google_artifact_registry_repository" "default" {
   repository_id = "default"
   format        = "DOCKER"
 }
+
+resource "google_compute_instance" "default" {
+  name         = "server"
+  machine_type = "e2-standard-4"
+  zone         = var.zone
+  tags         = ["postgres"]
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-2204-lts"
+    }
+  }
+
+  network_interface {
+    // Uses the default VPC network.
+    network = "default"
+    access_config {}
+  }
+}

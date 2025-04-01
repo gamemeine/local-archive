@@ -4,3 +4,4 @@ sqlalchemy
 asyncpg
 databases
 psycopg2-binary
+python-dotenv

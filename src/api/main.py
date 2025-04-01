@@ -1,9 +1,18 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db.db import database
 from db.models import Base
+from dotenv import load_dotenv
+
+APP_ENVIRONMENT = os.getenv("APP_ENVIRONMENT", "Development")
+
+if APP_ENVIRONMENT == "Production":
+    load_dotenv('.env.prod')
+elif APP_ENVIRONMENT == "Development":
+    load_dotenv('.env.local')
 
 app = FastAPI()
 
