@@ -1,5 +1,9 @@
 name: Build and Deploy
 
+permissions:
+  contents: write
+  releases: write
+
 on:
   push:
     branches:
@@ -130,6 +134,6 @@ jobs:
             Deployed webapp and API images for commit ${{ github.sha }}.
 
             **Service Links:**
-            - Webapp: [here](https://webapp-1002775068191.europe-west1.run.app)
+            - Webapp: [here](${{ vars.WEBAPP_URL }})
           draft: false
           prerelease: false
