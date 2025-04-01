@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  backend:
-    build: ./backend
+  api:
+    build: ./api
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
+      - ./api:/app
     environment:
       - UVICORN_HOST=0.0.0.0
       - DATABASE_URL=postgresql://user:password@db:5432/mydatabase  # Zmienna środowiskowa dla FastAPI
@@ -15,11 +15,11 @@ services:
     restart: always
 
   frontend:
-    build: ./frontend/LocalArchive
+    build: ./web
     ports:
       - "4200:80"
     depends_on:
-      - backend
+      - api
     restart: always
 
   db:
