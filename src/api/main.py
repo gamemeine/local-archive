@@ -1,19 +1,12 @@
-import os
+from environment import setup
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from db.db import database
+from db.db import get_database
 from db.models import Base
-from dotenv import load_dotenv
 
-APP_ENVIRONMENT = os.getenv("APP_ENVIRONMENT", "Development")
 
-if APP_ENVIRONMENT == "Production":
-    load_dotenv('.env.prod')
-elif APP_ENVIRONMENT == "Development":
-    load_dotenv('.env.local')
-
+setup()
 app = FastAPI()
 
 app.add_middleware(
@@ -23,6 +16,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+database = get_database()
 
 # Połączenie z bazą danych przy starcie
 @app.on_event("startup")

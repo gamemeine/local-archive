@@ -1,7 +1,7 @@
-from databases import Database
 import os
+from databases import Database
 
-# Pobieranie zmiennej środowiskowej z DATABASE_URL
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@db:5432/mydatabase")
 
-database = Database(DATABASE_URL)
+def get_database():
+    url = os.getenv("DATABASE_URL")
+    return Database(url)
