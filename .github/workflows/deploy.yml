@@ -54,14 +54,14 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: local-archive
+          project_id: '${{ vars.GCP_PROJECT }}'
           install_components: 'beta'
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy webapp \
             --image="${{ needs.build.outputs.image }}" \
-            --region=${{ vars.GCP_PROJECT }} \
+            --region=${{ vars.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated \
             --quiet
