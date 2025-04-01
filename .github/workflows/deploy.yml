@@ -104,7 +104,7 @@ jobs:
             --quiet
 
   release:
-    name: Create GitHub Release and Notify Discord
+    name: Create GitHub Release
     needs: [deploy_web, deploy_api]
     runs-on: ubuntu-latest
     steps:
