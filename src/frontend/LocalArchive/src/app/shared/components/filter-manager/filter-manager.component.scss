@@ -1,0 +1,28 @@
+.filterDiv {
+  display: flex;
+  width: 100vw;
+  min-height: 50px;
+  background-color: beige;
+  z-index: 1;
+  position: relative;
+  position: sticky;
+  top:100px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  span {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    input {
+      padding: 5px;
+      margin: 5px;
+      border: 2px solid rgb(109, 83, 49);
+      border-radius: 5px;
+      &:focus {
+        outline:none;
+      }
+    }
+  }
+}

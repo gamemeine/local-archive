@@ -1,0 +1,15 @@
+<div class="entryDiv">
+  <div class="dataDiv">
+    <div class="entryDate">Rok: <span>{{data.year}}</span></div>
+    <div class="entryLocation">Lokalizacja: <span>{{data.location}}</span></div>
+    <div class="entryPostalCode">Kod pocztowy: <span>{{data.postalCode}}</span></div>
+    <div class="entryContent">Zawartość zdjęcia: <span>{{data.content}}</span></div>
+  </div>
+  <div class="photoDiv">
+    <div class="private" *ngIf="data.private">
+      <h1>To zdjęcie jest prywatne</h1>
+      <button class="askButton">Poproś o dostęp</button>
+    </div>
+      <img [src]="getImageUrl(data.photo)" alt="{{data.content}}" *ngIf="!data.private"/>
+  </div>
+</div>
