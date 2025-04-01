@@ -7,6 +7,7 @@
       "type": "chrome",
       "request": "launch",
       "preLaunchTask": "npm: start",
+      "cwd": "${workspaceFolder}/src/web",
       "url": "http://localhost:4200/"
     },
     {
@@ -14,6 +15,7 @@
       "type": "chrome",
       "request": "launch",
       "preLaunchTask": "npm: test",
+      "cwd": "${workspaceFolder}/src/web",
       "url": "http://localhost:9876/debug.html"
     }
   ]
