@@ -38,6 +38,7 @@ async def shutdown():
 def read_root():
     return {"message": "Hello from FastAPI!"}
 
+
 @app.get("/api/data")
 async def get_data():
     query = "SELECT * FROM items"
