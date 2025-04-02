@@ -1,0 +1,38 @@
+name: Build Pipeline
+
+on:
+  pull_request:
+    branches:
+      - 'feature/*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js for Angular project
+        uses: actions/setup-node@v2
+        with:
+          node-version: '23.x'
+          
+      - name: Install Angular dependencies and run tasks
+        env:
+            CHROME_BIN: "/usr/bin/google-chrome"  # Update path as needed for Ubuntu
+        run: |
+            npm install
+            npm run build
+            npm run test -- --watch=false --browsers=ChromeHeadless
+
+      - name: Set up Python for FastAPI project
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+          
+      - name: Install FastAPI dependencies and run tasks
+        working-directory: ./src/api
+        run: |
+          pip install -r requirements.txt
+          flake8 .
+          pytest
