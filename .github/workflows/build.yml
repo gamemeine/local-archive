@@ -36,5 +36,6 @@ jobs:
         working-directory: ./src/api
         run: |
           pip install -r requirements.txt
+          pip install flake8
           flake8 .
           pytest
