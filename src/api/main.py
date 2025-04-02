@@ -19,7 +19,7 @@ app.add_middleware(
 
 database = get_database()
 
-# Połączenie z bazą danych przy starcie
+
 @app.on_event("startup")
 async def startup():
     # Łączenie z bazą
@@ -29,14 +29,17 @@ async def startup():
     engine = create_engine(str(database.url))
     Base.metadata.create_all(bind=engine)
 
+
 @app.on_event("shutdown")
 async def shutdown():
     # Rozłączanie z bazą
     await database.disconnect()
 
+
 @app.get("/")
 def read_root():
     return {"message": "Hello from FastAPI!"}
+
 
 @app.get("/api/data")
 async def get_data():
