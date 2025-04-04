@@ -37,5 +37,16 @@ services:
       - "5432:5432"
     restart: always
 
+  tests:
+    build: ./api
+    container_name: tests
+    command: ["pytest", "tests/"]
+    depends_on:
+      - db
+      - api
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/mydatabase
+
+
 volumes:
   postgres_data:

@@ -5,3 +5,5 @@ asyncpg
 databases
 psycopg2-binary
 python-dotenv
+pytest
+pytest-asyncio

@@ -1,13 +1,27 @@
-from environment import setup
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
+from contextlib import asynccontextmanager
+
+from environment import setup
 from db.db import get_database
 from db.models import Base
 
-
 setup()
-app = FastAPI()
+database = get_database()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await database.connect()
+    engine = create_engine(str(database.url))
+    Base.metadata.create_all(bind=engine)
+
+    yield
+
+    await database.disconnect()
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,24 +30,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-database = get_database()
-
-
-@app.on_event("startup")
-async def startup():
-    # Łączenie z bazą
-    await database.connect()
-
-    # Tworzenie tabel w bazie danych
-    engine = create_engine(str(database.url))
-    Base.metadata.create_all(bind=engine)
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    # Rozłączanie z bazą
-    await database.disconnect()
 
 
 @app.get("/")
