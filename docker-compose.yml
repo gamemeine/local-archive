@@ -2,12 +2,12 @@ version: '3.9'
 name: local-archive
 services:
   api:
-    build: ./api
+    build: ./src/api
     container_name: api
     ports:
       - "5002:8080"
     volumes:
-      - ./api:/app
+      - ./src/api:/app
     environment:
       - UVICORN_HOST=0.0.0.0
       - APP_ENVIRONMENT=Development
@@ -16,7 +16,7 @@ services:
     restart: always
 
   webapp:
-    build: ./web
+    build: ./src/web
     container_name: webapp
     ports:
       - "5001:8080"
@@ -38,14 +38,26 @@ services:
     restart: always
 
   tests:
-    build: ./api
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
     container_name: tests
-    command: ["pytest", "tests/"]
     depends_on:
       - db
       - api
+    volumes:
+      - ./tests:/tests
+      - ./src:/app
+      - ./src/api/requirements.txt:/tests/requirements.txt
+
     environment:
+      - PYTHONPATH=/app
       - DATABASE_URL=postgresql://user:password@db:5432/mydatabase
+    working_dir: /tests
+    command: ["pytest"]
+    profiles:
+      - tests
+
 
 
 volumes:
