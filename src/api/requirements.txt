@@ -5,3 +5,6 @@ asyncpg
 databases
 psycopg2-binary
 python-dotenv
+PyJWT
+pydantic-settings
+cryptography
