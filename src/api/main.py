@@ -1,9 +1,13 @@
+import os
 from environment import setup
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
 from db.db import get_database
 from db.models import Base
+from db.models import Item
+from db.schemas import ItemCreate
+from elasticsearch import Elasticsearch
 
 
 setup()
@@ -46,3 +50,24 @@ async def get_data():
     query = "SELECT * FROM items"
     result = await database.fetch_all(query)
     return result
+
+# elastic test
+
+
+def get_elasticsearch_client():
+    host = os.getenv("ELASTICSEARCH_HOST", "localhost")
+    return Elasticsearch(f"http://{host}:9200")
+
+
+es = get_elasticsearch_client()
+
+
+@app.post("/api/items")
+async def create_item(item: ItemCreate):
+    query = Item.__table__.insert().values(name=item.name, description=item.description)
+    item_id = await database.execute(query)
+
+    # Index in Elasticsearch
+    es.index(index="items", id=item_id, document=item.dict())
+
+    return {**item.dict(), "id": item_id}
