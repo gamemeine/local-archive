@@ -64,7 +64,8 @@ es = get_elasticsearch_client()
 
 @app.post("/api/items")
 async def create_item(item: ItemCreate):
-    query = Item.__table__.insert().values(name=item.name, description=item.description)
+    query = Item.__table__.insert().values(
+        name=item.name, description=item.description)
     item_id = await database.execute(query)
 
     # Index in Elasticsearch
