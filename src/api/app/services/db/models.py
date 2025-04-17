@@ -23,8 +23,8 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
-class Material(Base):
-    __tablename__ = 'material'
+class Media(Base):
+    __tablename__ = 'media'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
@@ -39,7 +39,7 @@ class Photo(Base):
     __tablename__ = 'photo'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    material_id = Column(Integer, ForeignKey('material.id'))
+    media_id = Column(Integer, ForeignKey('media.id'))
     file_url = Column(String(255), nullable=False)
     thumbnail_url = Column(String(255), nullable=False)
     storage_provider = Column(String(100))
@@ -51,7 +51,7 @@ class Comment(Base):
     __tablename__ = 'comment'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    material_id = Column(Integer, ForeignKey('material.id'))
+    media_id = Column(Integer, ForeignKey('media.id'))
     user_id = Column(Integer, ForeignKey('users.id'))
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -68,7 +68,7 @@ class Reaction(Base):
     __tablename__ = 'reaction'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    material_id = Column(Integer, ForeignKey('material.id'))
+    media_id = Column(Integer, ForeignKey('media.id'))
     user_id = Column(Integer, ForeignKey('users.id'))
     type = Column(String(20))
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -78,7 +78,7 @@ class AccessRequest(Base):
     __tablename__ = 'access_request'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    material_id = Column(Integer, ForeignKey('material.id'))
+    media_id = Column(Integer, ForeignKey('media.id'))
     requester_id = Column(Integer, ForeignKey('users.id'))
     justification = Column(Text)
     status = Column(String(50))
@@ -103,7 +103,7 @@ class Report(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     reporter_id = Column(Integer, ForeignKey('users.id'))
-    material_id = Column(Integer, ForeignKey('material.id'))
+    media_id = Column(Integer, ForeignKey('media.id'))
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
     resolved = Column(Boolean, default=False)
@@ -122,35 +122,18 @@ class Revision(Base):
     __tablename__ = 'revision'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    material_id = Column(Integer, ForeignKey('material.id'))
+    media_id = Column(Integer, ForeignKey('media.id'))
     changed_by = Column(Integer, ForeignKey('users.id'))
     change_type = Column(String(50))
     change_date = Column(DateTime, default=datetime.utcnow)
     change_details = Column(Text)
 
 
-class MaterialSearchIndex(Base):
-    __tablename__ = 'material_search_index'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    material_id = Column(Integer, ForeignKey('material.id'))
-    full_text = Column(Text)
-    address = Column(String(250))
-    latitude = Column(DECIMAL(10, 7))
-    longitude = Column(DECIMAL(10, 7))
-    creation_from = Column(DateTime)
-    creation_to = Column(DateTime)
-    contains = Column(ARRAY(String))
-    customDimensions = Column(ARRAY(String))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-
 class UserMetadata(Base):
     __tablename__ = 'user_metadata'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    material_id = Column(Integer, ForeignKey('material.id'))
+    media_id = Column(Integer, ForeignKey('media.id'))
     key = Column(String(100))
     value = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -160,7 +143,7 @@ class PredefinedMetadata(Base):
     __tablename__ = 'predefined_metadata'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    material_id = Column(Integer, ForeignKey('material.id'))
+    media_id = Column(Integer, ForeignKey('media.id'))
     metadata_type = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow)
 

@@ -1,5 +1,5 @@
 from testcontainers.postgres import PostgresContainer
-from db.models import Base
+from app.services.db import Base
 import sqlalchemy
 
 
@@ -10,7 +10,7 @@ def test_check_if_all_tables_are_present_in_DB():
         Base.metadata.create_all(engine)
         expected_tables = {
             "users",
-            "material",
+            "media",
             "photo",
             "comment",
             "comment_photo",
@@ -20,7 +20,6 @@ def test_check_if_all_tables_are_present_in_DB():
             "report",
             "report_photo",
             "revision",
-            "material_search_index",
             "user_metadata",
             "predefined_metadata",
             "locations",
