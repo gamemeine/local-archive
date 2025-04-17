@@ -1,7 +1,6 @@
 from sqlalchemy import (Column, Integer, String, Text,
                         DateTime, Boolean, ForeignKey, Float, DECIMAL)
 from sqlalchemy.orm import declarative_base
-from sqlalchemy.dialects.postgresql import ARRAY
 from datetime import datetime
 
 Base = declarative_base()
@@ -20,7 +19,8 @@ class User(Base):
     auth_provider = Column(String(100))
     profile_picture_url = Column(String(255))
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+                        onupdate=datetime.utcnow)
 
 
 class Media(Base):
@@ -32,7 +32,8 @@ class Media(Base):
     description = Column(Text)
     privacy = Column(String(50), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+                        onupdate=datetime.utcnow)
 
 
 class Photo(Base):
@@ -83,7 +84,8 @@ class AccessRequest(Base):
     justification = Column(Text)
     status = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+                        onupdate=datetime.utcnow)
 
 
 class AuditLog(Base):
@@ -151,7 +153,8 @@ class PredefinedMetadata(Base):
 class Location(Base):
     __tablename__ = 'locations'
 
-    metadata_id = Column(Integer, ForeignKey('predefined_metadata.id'), primary_key=True)
+    metadata_id = Column(Integer, ForeignKey(
+        'predefined_metadata.id'), primary_key=True)
     street = Column(String(255))
     city = Column(String(100))
     region = Column(String(100))
@@ -166,7 +169,8 @@ class Location(Base):
 class CreationDate(Base):
     __tablename__ = 'creation_dates'
 
-    metadata_id = Column(Integer, ForeignKey('predefined_metadata.id'), primary_key=True)
+    metadata_id = Column(Integer, ForeignKey(
+        'predefined_metadata.id'), primary_key=True)
     date_from = Column(DateTime)
     date_to = Column(DateTime)
 
