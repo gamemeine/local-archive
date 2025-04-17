@@ -4,6 +4,7 @@
   <input type="text" placeholder="email" [(ngModel)]="username" />
   <span>Hasło:</span>
   <input type="password" placeholder="hasło" [(ngModel)]="password" />
-  <button class = 'loginButton' (click)="navigateTo('/main')">Zaloguj się</button>
+  <button class = 'loginButton' (click)="navigateTo('/home')">Zaloguj się</button>
+  <app-login-button class = 'loginButton'></app-login-button>
   <button class = 'loginButton'>Zarejestruj się</button>
 </div>

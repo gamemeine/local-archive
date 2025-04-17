@@ -1,7 +1,7 @@
 <div class="topBar">
   <img src="../../../../assets/appLogo.jpg" alt="logo">
   <div class="nav">
-  <div class="topNav" *ngFor="let item of navEntries">{{ item.name }}</div>
+  <div class="topNav" *ngFor="let item of navEntries" routerLink="{{item.route}}">{{ item.name }}</div>
   </div>
   <app-logout-button></app-logout-button>
 </div>
