@@ -8,7 +8,7 @@ router = APIRouter(
 
 
 @router.post("/")
-async def search(client = Depends(get_elasticsearch)):
+async def search(client=Depends(get_elasticsearch)):
     result = client.search(index="media_index", query={
         "match_all": {}
     })
