@@ -3,6 +3,7 @@ from app.config import get_settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+
 def get_engine(settings=Depends(get_settings)):
     url = settings.database_url
     if url is None:

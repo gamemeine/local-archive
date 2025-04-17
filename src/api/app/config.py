@@ -2,6 +2,7 @@ import os
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 def get_env_file():
     env = os.getenv("APP_ENVIRONMENT", "Development")
     if env == "Production":
