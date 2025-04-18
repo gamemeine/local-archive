@@ -6,6 +6,7 @@ import { BrowsingViewComponent } from './shared/views/browsing-view/browsing-vie
 // Removed unused imports for HomeScreenComponent and AuthGuard
 import { AuthGuard } from '@auth0/auth0-angular';
 import { MyPhotosViewComponent } from './shared/views/my-photos-view/my-photos-view.component';
+import { AddPhotoComponent } from './shared/views/add-photo/add-photo.component';
 
 
 export const routes: Routes = [
@@ -28,6 +29,10 @@ export const routes: Routes = [
       {
         path: 'photos',
         component: MyPhotosViewComponent,
+      },
+      {
+        path: 'add-photos',
+        component: AddPhotoComponent
       },
       { path: '**',
         component: PageNotFoundComponent,

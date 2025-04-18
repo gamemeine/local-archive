@@ -6,6 +6,7 @@
   position: relative;
   top: 0px;
   height: calc(100vh - 100px);
+  overflow-y: scroll;
 }
 
 .displayDiv::-webkit-scrollbar {

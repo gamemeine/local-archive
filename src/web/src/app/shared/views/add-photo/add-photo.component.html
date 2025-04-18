@@ -1,0 +1,52 @@
+<div class="addPhoto">
+<div class="addPhotoForm">
+  <!-- <button class="addButton">Dodaj zdjęcie +</button> -->
+
+  <span>
+    <h3>Data utworzenia:</h3>
+    <input type="date" name="data" id="dateInput">
+  </span>
+  <hr>
+  <span>
+    <h3>Czy znasz dokładny adres?</h3>
+      <input type="radio" name="addressOption" value="yes" class="radio"> Tak
+      <input type="radio" name="addressOption" value="no" class="radio"> Nie
+
+  </span>
+  <hr>
+  <span>
+    <h3>Lokalizacja:</h3>
+    <app-map-picker (coordinatesSelected)="onCoordsPicked($event)"></app-map-picker>
+    <p><b>Wybrana lokalizacja:</b><br>
+      <!-- Szerokość: {{ selectedCoords?.lat | number:'1.4-4' }}<br>
+      Długość: {{ selectedCoords?.lng | number:'1.4-4' }}</p> -->
+      {{ address }}</p>
+  </span>
+  <!-- <hr>
+  <span>
+    <h3>Kod pocztowy:</h3>
+    <input type="text" name="postalCode" id="dateInput">
+  </span> -->
+  <hr>
+  <span>
+    <h3>Zawartość zdjęcia:</h3>
+    <input type="text" name="content" id="dateInput">
+  </span>
+</div>
+<div class="photos">
+  <span class="photoLabel">
+    <h1>Wybierz zdjecia:</h1>
+    <input type="file" name="photos" id="photosFiles" multiple (change)="onFileChanged($event)" >
+  </span>
+
+  <div  class="preview">
+    <div class="image-container" *ngIf="url">
+      <img [src]="url" alt="Selected Image" />
+    </div>
+    <div class="controls" *ngIf="imagePath.length > 1">
+      <button (click)="changePhoto('left')"> < < < </button>
+      <button (click)="changePhoto('right')"> > > > </button>
+    </div>
+  </div>
+</div>
+</div>
