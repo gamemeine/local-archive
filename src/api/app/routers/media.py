@@ -10,6 +10,6 @@ router = APIRouter(
 
 @router.get("/")
 def get_media(db=Depends(get_database)):
-    query = text("SELECT * FROM items")
+    query = text("SELECT * FROM media")
     result = db.execute(query)
     return result.fetchall()
