@@ -20,4 +20,4 @@ def get_media(db=Depends(get_database)):
 @router.post("/upload")
 async def upload_img(file: UploadFile = File(...)):
     image_url = await save_image(file)
-    return {"img_url" : image_url}
+    return {"img_url": image_url}

@@ -2,6 +2,8 @@ import os
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+UPLOAD_DIR = "app/static/uploads"
+
 
 def get_env_file():
     env = os.getenv("APP_ENVIRONMENT", "Development")

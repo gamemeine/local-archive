@@ -1,7 +1,7 @@
 from fastapi import UploadFile
 import os
-
-UPLOAD_DIR = "app/static/uploads"
+from app.repository.media_repository import save_file
+from app.config import UPLOAD_DIR
 
 
 async def save_image(file: UploadFile) -> str:
@@ -9,4 +9,4 @@ async def save_image(file: UploadFile) -> str:
 
     await save_file(file, filepath)
 
-    return f"/static/uploads/{filename}"
+    return f"/static/uploads/{file.filename}"
