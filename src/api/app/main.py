@@ -6,16 +6,13 @@ from .routers import search, media
 from .services.db import get_engine, Base
 from .services.es import get_elasticsearch
 
-from app.config import get_settings, UPLOAD_DIR
+from app.config import get_settings
 
 app = FastAPI()
 
 
 app.include_router(media.router)
 app.include_router(search.router)
-
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,6 +27,8 @@ app.add_middleware(
 def on_startup():
     settings = get_settings()
     # Create dir for storing images on server
+    os.makedirs(settings.upload_dir, exist_ok=True)
+    app.mount("/static", StaticFiles(directory="app/static"), name="static")
     # setup database
     engine = get_engine(settings)
     Base.metadata.create_all(bind=engine)
