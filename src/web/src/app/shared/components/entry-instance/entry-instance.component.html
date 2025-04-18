@@ -1,9 +1,9 @@
 <div class="entryDiv">
   <div class="dataDiv">
-    <div class="entryDate">Rok: <span>{{data.year}}</span></div>
-    <div class="entryLocation">Lokalizacja: <span>{{data.location}}</span></div>
-    <div class="entryPostalCode">Kod pocztowy: <span>{{data.postalCode}}</span></div>
-    <div class="entryContent">Zawartość zdjęcia: <span>{{data.content}}</span></div>
+    <div class="entry">Rok utworzenia:<br><span>{{data.year}}</span></div>
+    <div class="entry">Lokalizacja:<br><span>{{data.location}}</span></div>
+    <div class="entry">Kod pocztowy:<br><span>{{data.postalCode}}</span></div>
+    <div class="entry">Zawartość zdjęcia:<br><span>{{data.content}}</span></div>
   </div>
   <div class="photoDiv">
     <div class="private" *ngIf="data.private">

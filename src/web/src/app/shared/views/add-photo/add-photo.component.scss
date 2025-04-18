@@ -1,0 +1,131 @@
+@import '../../styles/colors.scss';
+
+.addPhoto {
+  color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  overflow: hidden;
+  height: calc(100vh - 100px);
+}
+
+.addPhotoForm {
+  width: calc(40vw - 100px);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: left;
+  padding: 20px 50px;
+  position: relative;
+  span {
+
+    width: 100%;
+    height: fit-content;
+
+    h3 {
+      width: calc(100% - 10px);
+      padding: 5px;
+      margin: 0px;
+    }
+    input {
+      width: calc(100% - 30px);
+      padding: 5px;
+      margin: 5px;
+    }
+    .radio {
+      width: 20px;
+    }
+  }
+//   p,span {
+//     border: 2px solid red;
+// }
+overflow-y: scroll;
+}
+.addPhotoForm::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.addPhotoForm {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.photos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 60vw;
+  height: calc(100vh - 100px);
+  overflow-y: scroll;
+  position: relative;
+}
+
+.photos::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.photos {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.photoLabel {
+  color: white;
+  display: block;
+  text-align: center;
+  height: 100px;
+}
+
+.preview {
+  height: calc(100vh - 250px);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  p {
+    width: 100%;
+    display: block;
+  }
+  .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+    padding: 20px;
+    width: calc(100% - 40px);
+    overflow: hidden;
+  }
+
+  .image-container img {
+    max-height: calc(100% - 4px);
+    border: 2px solid $lightGray;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  .controls {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: space-around;
+    button {
+      padding: 10px 100px;
+      font-weight: bolder;
+      background-color: $darkGray;
+      border: 3px outset $lightGray;
+      color: gray;
+      border-radius: 20px;
+      &:hover {
+        border: 3px inset $lightGray;
+        cursor: pointer;
+      }
+    }
+
+  }
+}
+
+hr {
+  width: 80%;
+}

@@ -1,10 +1,14 @@
 .displayDiv {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  width: 100vw;
+  width: 70vw;
+  position: relative;
+  top: 0px;
+  height: calc(100vh - 100px);
+  overflow-y: scroll;
 }
+
 .displayDiv::-webkit-scrollbar {
   display: none;
 }

@@ -1,3 +1,5 @@
+import { map } from "rxjs";
+
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8000/api',
@@ -7,5 +9,8 @@ export const environment = {
     authorizationParams: {
       redirect_uri: window.location.origin,
     },
+  },
+  mapbox: {
+    accessToken: "pk.eyJ1Ijoib3V0Y2FzdHBpcmF0ZSIsImEiOiJjbTkxYTB4NGQwdW53MmxzaTU0c3BtZ3htIn0.__5N8i1VYPNOu0AcNA9_PA"
   },
 };

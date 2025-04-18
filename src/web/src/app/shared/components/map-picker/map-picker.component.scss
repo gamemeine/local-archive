@@ -1,0 +1,8 @@
+@import '../../styles/colors.scss';
+
+#map {
+  margin: 10px;
+  width: calc(100% - 26px);
+  height: 300px;
+  border: 3px ridge $lightGray
+}

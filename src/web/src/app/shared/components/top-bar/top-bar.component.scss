@@ -1,11 +1,15 @@
+@import '../../styles/colors.scss';
+
 .topBar {
   width: 100vw;
   height: 100px;
   display: flex;
   justify-content: left;
   align-items: center;
-  background-color: rgb(209, 197, 165);
-  box-shadow: 0 0 10px rgb(0, 0, 0);
+  // background-color: rgb(209, 197, 165);
+  background-color: $darkGray;
+  color: white;
+  // box-shadow: 0 0 10px rgb(255, 255, 255);
   position: relative;
   position: sticky;
   top:0px;
@@ -34,7 +38,8 @@
     align-items: center;
     &:hover {
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-      background-color: rgb(192, 179, 146);
+      // background-color: rgb(192, 179, 146);
+      background-color: $lightGray;
       cursor: pointer;
     }
   }
