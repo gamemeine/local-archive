@@ -6,7 +6,7 @@ import { RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss','/node_modules/mapbox-gl/dist/mapbox-gl.css']
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'LocalArchive';
