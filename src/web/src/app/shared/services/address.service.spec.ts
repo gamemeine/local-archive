@@ -1,12 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AddressService } from './address.service';
+import { HttpClientModule } from '@angular/common/http';
 
 describe('AddressService', () => {
   let service: AddressService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [HttpClientModule],
+      providers: [AddressService],
+    });
     service = TestBed.inject(AddressService);
   });
 
