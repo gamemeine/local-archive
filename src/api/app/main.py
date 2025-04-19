@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from .routers import search, media
 from .services.db import get_engine, Base
@@ -28,12 +30,36 @@ def on_startup():
     # setup database
     engine = get_engine(settings)
     Base.metadata.create_all(bind=engine)
+    print("Database tables created or already exist.")
 
     # setup elasticsearch
     client = get_elasticsearch(settings)
-    client.indices.create(index="media_index", ignore=400)
+    mapping = {
+        "mappings": {
+            "properties": {
+                "location": {
+                    "properties": {
+                        "coordinates": {
+                            "type": "geo_point"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    client.indices.create(index="media_index", body=mapping, ignore=400)
+    print("Elasticsearch index created or already exists.")
 
 
 @app.get("/")
 def hello():
     return "Hey!"
+
+
+@app.exception_handler(RequestValidationError)
+async def value_error_exception_handler(request: Request, exc: RequestValidationError):
+    print(f"ValueError: {exc}")
+    return JSONResponse(
+        status_code=400,
+        content={"problems": [e['msg'] for e in exc.errors()]},
+    )
