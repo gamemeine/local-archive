@@ -1,7 +1,13 @@
 from .models import SearchLocation, YearRange
 
 
-def get_query(location: SearchLocation, creation_date: YearRange | None = None, page: int = 0, size: int = 10) -> dict:
+def get_query(
+    location: SearchLocation,
+    phrase: str | None = None,
+    creation_date: YearRange | None = None,
+    page: int = 0,
+    size: int = 10,
+) -> dict:
     assert location, "Location must be provided"
 
     filters = [
@@ -36,10 +42,16 @@ def get_query(location: SearchLocation, creation_date: YearRange | None = None, 
             }
         })
 
+    musts = []
+    if phrase:
+        musts.append({"match": {"title": phrase}})
+    else:
+        musts.append({"match_all": {}})
+
     return {
         "query": {
             "bool": {
-                "must": [{"match_all": {}}],
+                "must": musts,
                 "filter": filters
             }
         },

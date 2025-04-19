@@ -28,6 +28,7 @@ async def delete_media(media_id: int, client=Depends(get_elasticsearch)):
 
 class MediaSearchRequest(BaseModel):
     location: SearchLocation
+    phrase: str | None = None
     creation_date: YearRange | None = None
     page: int = 0
     size: int = 10
@@ -55,7 +56,7 @@ class MediaSearchRequest(BaseModel):
 
 @router.post("/")
 async def search(request: MediaSearchRequest, client=Depends(get_elasticsearch)):
-    body = get_query(request.location, request.creation_date, request.page, request.size)
+    body = get_query(request.location, request.phrase, request.creation_date, request.page, request.size)
     result = client.search(index="media_index", body=body)
 
     media = []
