@@ -1,4 +1,3 @@
-from typing import Self
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, model_validator
 from app.services.es import get_elasticsearch, get_query, SearchLocation, YearRange, MediaDocument
@@ -34,14 +33,14 @@ class MediaSearchRequest(BaseModel):
     size: int = 10
 
     @model_validator(mode='after')
-    def validate_location(self) -> Self:
+    def validate_location(self):
         if not self.location:
             raise ValueError("Location must be provided")
 
         return self
 
     @model_validator(mode='after')
-    def validate_paging(self) -> Self:
+    def validate_paging(self):
         if self.page < 0:
             raise ValueError("Page must be greater than or equal to 0")
 

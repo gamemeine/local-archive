@@ -1,4 +1,3 @@
-from typing import Self
 from pydantic import BaseModel, model_validator
 
 
@@ -16,7 +15,7 @@ class YearRange(BaseModel):
     year_to: int
 
     @model_validator(mode='after')
-    def check_year_range(self) -> Self:
+    def check_year_range(self):
         if not (self.year_from and self.year_to):
             raise ValueError("Both year_from and year_to must be provided")
         if int(self.year_from) > int(self.year_to):
@@ -31,7 +30,7 @@ class CreationDate(BaseModel):
     day: int | None = None
 
     @model_validator(mode='after')
-    def check_date(self) -> Self:
+    def check_date(self):
         if not (self.year_range or self.year):
             raise ValueError("Either year_range or year must be provided")
 
@@ -57,7 +56,7 @@ class SearchLocation(BaseModel):
     bottom_right: Coordinates
 
     @model_validator(mode='after')
-    def check_bounding_box(self) -> Self:
+    def check_bounding_box(self):
         if self.top_left.lon > self.bottom_right.lon or self.top_left.lat < self.bottom_right.lat:
             raise ValueError("Invalid bounding box coordinates")
         return self
