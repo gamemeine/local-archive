@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
+import os
 from .routers import search, media
 from .services.db import get_engine, Base
 from .services.es import get_elasticsearch
@@ -10,6 +11,7 @@ from .services.es import get_elasticsearch
 from app.config import get_settings
 
 app = FastAPI()
+
 
 app.include_router(media.router)
 app.include_router(search.router)
@@ -26,7 +28,9 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     settings = get_settings()
-
+    # Create dir for storing images on server
+    os.makedirs(settings.upload_dir, exist_ok=True)
+    app.mount("/static", StaticFiles(directory="app/static"), name="static")
     # setup database
     engine = get_engine(settings)
     Base.metadata.create_all(bind=engine)
