@@ -1,6 +1,6 @@
 from sqlalchemy import (Column, Integer, String, Text,
                         DateTime, Boolean, ForeignKey, Float, DECIMAL)
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
 
 Base = declarative_base()
@@ -35,6 +35,8 @@ class Media(Base):
     updated_at = Column(DateTime, default=datetime.utcnow,
                         onupdate=datetime.utcnow)
 
+    photo = relationship("Photo", back_populates="media", uselist=False)
+
 
 class Photo(Base):
     __tablename__ = 'photo'
@@ -46,6 +48,8 @@ class Photo(Base):
     storage_provider = Column(String(100))
     file_size = Column(Integer)
     uploaded_at = Column(DateTime, default=datetime.utcnow)
+
+    media = relationship("Media", back_populates="photo")
 
 
 class Comment(Base):
