@@ -1,6 +1,7 @@
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Form
 from app.services.db import get_database
-from app.services.media_service import save_image, delete_image
+from app.services.media_service import (save_image, delete_image,
+                                        save_img_metadata_in_db)
 
 from sqlalchemy import text
 
@@ -18,8 +19,13 @@ def get_media(db=Depends(get_database)):
 
 
 @router.post("/upload")
-async def upload_img(file: UploadFile = File(...)):
-    image_url = await save_image(file)
+async def upload_img(
+        title: str = Form(...),
+        description: str = Form(...),
+        file: UploadFile = File(...)
+):
+    image_url = await save_image(file, title, description)
+    await save_img_metadata_in_db(title, description, image_url)
     return {"img_url": image_url}
 
 
