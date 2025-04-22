@@ -1,0 +1,61 @@
+@import '../../styles/colors.scss';
+
+.filters {
+  h1 {
+    margin: 0px;
+    margin-bottom: 20px;
+  }
+  max-width: 700px;
+  width: 60vw;
+  max-height: 80vh;
+  border: 4px ridge $lightGray;
+  background-color: $mainGray;
+  color: white;
+  padding: 20px;
+  overflow-y: scroll;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  hr {
+    width: 100%;
+  }
+}
+
+.category {
+  span {
+    display: block;
+    margin-left: 20px;
+  }
+  b {
+    display: block;
+    padding: 10px;
+  }
+}
+
+.oneEntry {
+  input {
+    padding: 2px 5px;
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+#content {
+  width: 90%;
+}
+
+.apply {
+  padding: 10px 20px;
+  font-weight: bolder;
+  background-color: $mainGreen;
+  color: white;
+  border: 3px outset $lightGray;
+  border-radius: 20px;
+  align-self: right;
+  transition: all 0.3s ease-in-out;
+  &:hover {
+    cursor: pointer;
+    border: 3px inset $lightGray;
+  }
+}

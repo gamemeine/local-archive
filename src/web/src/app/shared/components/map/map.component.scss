@@ -1,3 +1,5 @@
+@import '../../styles/colors.scss';
+
 .parentMap {
   width: calc(30vw - 5px);
   border-left: 5px ridge gray;
@@ -24,5 +26,9 @@
     background-color: transparent;
     border-radius: 20px;
     padding: 5px 10px;
+    &:hover {
+      background-color: $lightGray;
+      cursor: pointer;
+    }
   }
 }

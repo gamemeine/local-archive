@@ -1,0 +1,57 @@
+<div class="filters">
+  <h1>Filtry</h1>
+  <hr>
+  <span class="category">
+    <b>Czas:</b>
+    <span>
+      <span class="oneEntry">
+      Od roku:
+      <input type="number"  (ngModelChange)="onFiltersChange()" [(ngModel)]="fromYear"/>
+      </span>
+      <br>
+      <span class="oneEntry">
+      Do roku:
+      <input type="number" (ngModelChange)="onFiltersChange()" [(ngModel)]="toYear"/>
+      </span>
+      <br>
+      <span class="oneEntry">
+      Od miesiąca:
+      <input type="number"(ngModelChange)="onFiltersChange()" [(ngModel)]="fromMonth"/>
+      </span>
+      <br>
+      <span class="oneEntry">
+      Do miesiąca:
+      <input type="month" (ngModelChange)="onFiltersChange()" [(ngModel)]="toMonth"/>
+      </span>
+    </span>
+  </span>
+  <hr>
+  <span class="category">
+    <b>Lokalizacja:</b>
+    <span>
+      <span class="oneEntry">
+      Miasto:
+      <input type="text" placeholder="Warszawa" (ngModelChange)="onFiltersChange()" [(ngModel)]="town"/>
+      </span>
+      <br>
+      <span class="oneEntry">
+      Województwo:
+      <input type="text" placeholder="Mazowieckie" (ngModelChange)="onFiltersChange()" [(ngModel)]="state"/>
+      </span>
+      <br>
+      <span class="oneEntry">
+        Kraj:
+        <input type="text" placeholder="Polska" (ngModelChange)="onFiltersChange()" [(ngModel)]="country"/>
+        </span>
+    </span>
+  </span>
+  <hr>
+  <span class="category">
+    <b>Zawartość:</b>
+    <span class="oneEntry">
+      <input type="text" name="content" id="content">
+    </span>
+  </span>
+  <hr>
+  <button class="apply" (click)="closeDialog()">Zastosuj filtry</button>
+</div>
