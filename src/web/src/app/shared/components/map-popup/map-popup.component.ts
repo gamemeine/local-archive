@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { DialogRef } from '@angular/cdk/dialog';
+import { DialogModule, DialogRef } from '@angular/cdk/dialog';
 import { FormsModule } from '@angular/forms';
 import { MarkerService } from '../../services/marker.service';
 
 @Component({
   selector: 'app-map-popup',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DialogModule],
   templateUrl: './map-popup.component.html',
   styleUrls: ['./map-popup.component.scss','../filters-popup/filters-popup.component.scss'],
 })

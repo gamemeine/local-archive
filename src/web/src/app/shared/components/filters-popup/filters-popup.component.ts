@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DialogRef } from '@angular/cdk/dialog';
+import { Dialog, DialogModule, DialogRef } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-filters-popup',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DialogModule],
   templateUrl: './filters-popup.component.html',
   styleUrl: './filters-popup.component.scss'
 })
