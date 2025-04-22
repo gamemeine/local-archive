@@ -1,26 +1,60 @@
 <div class="addPhoto">
 <div class="addPhotoForm">
   <!-- <button class="addButton">Dodaj zdjęcie +</button> -->
-
   <span>
-    <h3>Data utworzenia:</h3>
-    <input type="date" name="data" id="dateInput">
+    <h3>Czy znasz dokładną datę utworzenia?</h3>
+      <input type="radio" name="addressOption" [value]="true" class="radio" [(ngModel)]="preciseDate"> Tak
+      <input type="radio" name="addressOption" [value]="false" class="radio" [(ngModel)]="preciseDate"> Nie
   </span>
   <hr>
+  <ng-container *ngIf="preciseDate; else elseTemplate">
+    <span>
+      <h3>Data utworzenia:</h3>
+      <input type="date" name="preciseTime" id="dateInput">
+    </span>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <span>
+      <h3>Rok utworzenia:</h3>
+      <input type="year" name="year" id="dateInput">
+      <h3>Miesiąc utworzenia:</h3>
+      <input type="month" name="month" id="dateInput">
+      <h3>Dzień utworzenia:</h3>
+      <input type="day" name="day" id="dateInput">
+    </span>
+  </ng-template>
+
+
+  <hr>
   <span>
+
+
     <h3>Czy znasz dokładny adres?</h3>
-      <input type="radio" name="addressOption" value="yes" class="radio"> Tak
-      <input type="radio" name="addressOption" value="no" class="radio"> Nie
+      <input type="radio" name="locationOption" [value]="true" class="radio" [(ngModel)]="preciseLocation"> Tak
+      <input type="radio" name="locationOption" [value]="false" class="radio" [(ngModel)]="preciseLocation"> Nie
 
   </span>
   <hr>
   <span>
-    <h3>Lokalizacja:</h3>
-    <app-map-picker (coordinatesSelected)="onCoordsPicked($event)"></app-map-picker>
-    <p><b>Wybrana lokalizacja:</b><br>
-      <!-- Szerokość: {{ selectedCoords?.lat | number:'1.4-4' }}<br>
-      Długość: {{ selectedCoords?.lng | number:'1.4-4' }}</p> -->
-      {{ address }}</p>
+    <ng-container *ngIf="preciseLocation; else locationTemplate">
+      <h3>Lokalizacja:</h3>
+      <app-map-picker (coordinatesSelected)="onCoordsPicked($event)"></app-map-picker>
+      <p><b>Wybrana lokalizacja:</b><br>
+        <!-- Szerokość: {{ selectedCoords?.lat | number:'1.4-4' }}<br>
+        Długość: {{ selectedCoords?.lng | number:'1.4-4' }}</p> -->
+        {{ address }}</p>
+    </ng-container>
+    <ng-template #locationTemplate>
+        <h3>Miasto:</h3>
+        <input type="text" name="town" id="dateInput">
+        <h3>Województwo:</h3>
+        <input type="text" name="state" id="dateInput">
+        <h3>Kod pocztowy:</h3>
+        <input type="text" name="postalCode" id="dateInput">
+        <h3>Ulica:</h3>
+        <input type="text" name="street" id="dateInput">
+    </ng-template>
+
   </span>
   <!-- <hr>
   <span>

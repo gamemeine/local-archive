@@ -22,6 +22,12 @@
 
     width: 100%;
     height: fit-content;
+    input {
+      font-weight: bolder;
+      &:focus {
+        outline: none;
+      }
+    }
 
     h3 {
       width: calc(100% - 10px);

@@ -1,0 +1,16 @@
+<div class="filters">
+  <h1>Filtry</h1>
+  <hr>
+  <span class="category">
+    <b>Zakres wyboru:</b>
+    <span>
+      <span class="oneEntry">
+      Promień:
+      <input type="number"  class="meters" (ngModelChange)="onMapSettingsChange()" [(ngModel)]="radius"/>m
+      </span>
+    </span>
+  </span>
+  <hr>
+  <button class="apply" (click)="closeDialog()">Zastosuj</button>
+
+</div>
