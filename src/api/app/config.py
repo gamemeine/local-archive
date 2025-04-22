@@ -14,6 +14,7 @@ def get_env_file():
 class Settings(BaseSettings):
     database_url: str
     elasticsearch_url: str
+    upload_dir: str = "app/static/uploads"
 
     model_config = SettingsConfigDict(env_file=get_env_file())
 
