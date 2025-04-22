@@ -3,17 +3,21 @@ import { Component, OnInit } from '@angular/core';
 import { MapPickerComponent } from '../../components/map-picker/map-picker.component';
 import { AddressService } from '../../services/address.service';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-add-photo',
   standalone: true,
-  imports: [CommonModule, MapPickerComponent, HttpClientModule],
+  imports: [CommonModule, MapPickerComponent, HttpClientModule, FormsModule],
   templateUrl: './add-photo.component.html',
   styleUrl: './add-photo.component.scss'
 })
 export class AddPhotoComponent implements OnInit{
 
   constructor(private mapboxService: AddressService) {}
+
+  preciseDate : boolean = true;
+  preciseLocation : boolean = true;
 
   ngOnInit(): void {
       console.log(HttpClientModule)
@@ -78,4 +82,8 @@ changePhoto(direction: string){
   }
 }
 }
+
+
+
+
 }

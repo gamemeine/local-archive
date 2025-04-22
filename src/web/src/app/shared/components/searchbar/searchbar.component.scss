@@ -1,0 +1,46 @@
+@import '../../styles/colors.scss';
+
+.bar {
+  position: sticky;
+  top: 0px;
+  left: 0px;
+  width: calc(100% - 10px);
+  border-bottom: 4px ridge gray;
+  background-color: $mainGray;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  padding:  10px;
+  padding-right: 0px;
+  input {
+    flex-grow: 1;
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 2px solid white;
+    &:focus {
+      outline: none;
+    }
+    font-weight: bolder;
+    font-size: 20px;
+  }
+}
+
+.filters {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  button {
+    font-weight: bolder;
+    font-size: 20px;
+    color: white;
+    border: 2px solid white;
+    background-color: transparent;
+    border-radius: 20px;
+    padding: 5px 10px;
+    margin: 5px;
+    &:hover {
+      background-color: $lightGray;
+      cursor: pointer;
+    }
+  }
+}
