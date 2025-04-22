@@ -7,6 +7,7 @@ import { MarkerService } from '../../services/marker.service';
   selector: 'app-map-popup',
   standalone: true,
   imports: [FormsModule, DialogModule],
+
   templateUrl: './map-popup.component.html',
   styleUrls: ['./map-popup.component.scss','../filters-popup/filters-popup.component.scss'],
 })
