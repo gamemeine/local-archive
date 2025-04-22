@@ -5,8 +5,14 @@
   width: 70vw;
   position: relative;
   top: 0px;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 170px);
+  padding-bottom: 70px;
   overflow-y: scroll;
+}
+
+.search {
+  width: 70vw;
+  position: relative;
 }
 
 .displayDiv::-webkit-scrollbar {
