@@ -21,6 +21,16 @@
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .displayDiv {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+h1 {
+  color: white;
+  font-size: 40px;
+  font-weight: bolder;
+  margin: 20px 0px;
+  margin-top: 100px;
 }

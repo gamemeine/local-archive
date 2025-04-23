@@ -9,7 +9,7 @@ import { AuthService } from '@auth0/auth0-angular';
   selector: 'app-login-form',
   standalone: true,
 
-  imports: [CommonModule, FormsModule, RouterModule, LoginButtonComponent],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss'
 })
@@ -17,8 +17,14 @@ export class LoginFormComponent {
 
   username : string = '';
   password : string = '';
+  constructor(public auth: AuthService, private router: Router) {}
 
-  constructor(private router: Router) {}
+  login(): void {
+    this.auth.loginWithRedirect({
+      appState: { target: '/home' },
+    });
+  }
+
 
   navigateTo(route: string) {
     this.router.navigate([route]);

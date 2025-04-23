@@ -135,3 +135,18 @@ overflow-y: scroll;
 hr {
   width: 80%;
 }
+
+.addPhotoButton {
+  background-color: $mainGreen;
+  padding: 10px 20px;
+  border: 4px outset white;
+  color: white;
+  font-size: 25px;
+  font-weight: bolder;
+  border-radius: 50px;
+  &:hover {
+    border: 4px inset white;
+    cursor: pointer;
+  }
+  margin: 25px;
+}
