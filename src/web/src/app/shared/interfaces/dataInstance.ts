@@ -7,4 +7,5 @@ export interface DataInstance {
   content?: string;
   postalCode?: string;
   private?: boolean;
+  id: string;
 }

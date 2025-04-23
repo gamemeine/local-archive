@@ -3,9 +3,11 @@ import { EntryInstanceComponent } from '../entry-instance/entry-instance.compone
 import { MockPhotos } from '../../mocks/mockPhotos';
 import { CommonModule } from '@angular/common';
 import { DataInstance } from '../../interfaces/dataInstance';
-import { SearchbarComponent } from "../searchbar/searchbar.component";
+import { SearchbarComponent } from '../searchbar/searchbar.component';
 import { MediaServiceService } from '../../services/media-service.service';
 import { Media } from '../../interfaces/media';
+import { PhotoServiceService } from '../../services/photo-service.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-content-display',
@@ -16,15 +18,33 @@ import { Media } from '../../interfaces/media';
 })
 export class ContentDisplayComponent {
   media: Media[] = [];
+  photos: DataInstance[] = [];
 
-  constructor(private mediaService: MediaServiceService) {}
+  private subscriptions = new Subscription();
+
+  constructor(
+    private mediaService: MediaServiceService,
+    private photoService: PhotoServiceService
+  ) {}
 
   ngOnInit(): void {
-    this.mediaService.search().subscribe((result) => {
-      console.log(result);
-      this.media = result;
-    });
+    // Subscribe to media
+    this.subscriptions.add(
+      this.mediaService.search().subscribe((result) => {
+        console.log(result);
+        this.media = result;
+      })
+    );
+
+    // Subscribe to photo updates
+    this.subscriptions.add(
+      this.photoService.filteredPhotos$.subscribe((photos) => {
+        this.photos = photos;
+      })
+    );
   }
 
-  photos: DataInstance[] = MockPhotos;
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe(); // Clean up
+  }
 }

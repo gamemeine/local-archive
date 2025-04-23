@@ -4,7 +4,8 @@ import { MapPickerComponent } from '../../components/map-picker/map-picker.compo
 import { AddressService } from '../../services/address.service';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-
+import { ApprovalPopupComponent } from '../../components/approval-popup/approval-popup.component';
+import { Dialog } from '@angular/cdk/dialog';
 @Component({
   selector: 'app-add-photo',
   standalone: true,
@@ -14,7 +15,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class AddPhotoComponent implements OnInit{
 
-  constructor(private mapboxService: AddressService) {}
+  constructor(private mapboxService: AddressService, private dialog: Dialog) {}
 
   preciseDate : boolean = true;
   preciseLocation : boolean = true;
@@ -83,7 +84,8 @@ changePhoto(direction: string){
 }
 }
 
-
-
+addPhoto() {
+  this.dialog.open(ApprovalPopupComponent);
+}
 
 }
