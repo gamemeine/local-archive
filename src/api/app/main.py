@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
-from .routers import search, media
+from .routers import search, media, access_request
 from .services.db import get_engine, Base
 from .services.es import get_elasticsearch
 
@@ -14,6 +14,7 @@ app = FastAPI()
 
 
 app.include_router(media.router)
+app.include_router(access_request.router)
 app.include_router(search.router)
 
 app.add_middleware(
