@@ -32,4 +32,8 @@ export class MediaServiceService {
 
     return this.http.post<Media[]>(`${environment.apiUrl}/search`, body);
   }
+
+  uploadMedia(formData: FormData) {
+    return this.http.post(`${environment.apiUrl}/media/upload`, formData);
+  }
 }
