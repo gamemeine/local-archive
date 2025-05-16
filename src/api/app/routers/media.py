@@ -5,7 +5,7 @@ from app.services.media_service import (save_image, delete_image,
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from typing import Optional
 
 router = APIRouter(
     prefix="/media",
@@ -24,11 +24,12 @@ def get_media(db=Depends(get_database)):
 async def upload_img(
         title: str = Form(...),
         description: str = Form(...),
+        location: Optional[str] = Form(None),
         file: UploadFile = File(...),
         db: AsyncSession = Depends(get_database)
 ):
     image_url = await save_image(file)
-    save_img_metadata_in_db(file, title, description, image_url, db)
+    save_img_metadata_in_db(file, title, description, location, image_url, db)
     return {"img_url": image_url}
 
 
