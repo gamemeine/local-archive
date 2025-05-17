@@ -31,7 +31,6 @@ export class ContentDisplayComponent {
     // Subscribe to media
     this.subscriptions.add(
       this.mediaService.search().subscribe((result) => {
-        console.log(result);
         this.media = result;
       })
     );

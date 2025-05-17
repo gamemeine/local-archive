@@ -14,10 +14,10 @@ export class MediaServiceService {
       location: {
         top_left: {
           lon: 0,
-          lat: 0,
+          lat: 100,
         },
         bottom_right: {
-          lon: 0,
+          lon: 100,
           lat: 0,
         },
       },

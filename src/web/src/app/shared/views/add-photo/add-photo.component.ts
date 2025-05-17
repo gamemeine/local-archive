@@ -98,6 +98,19 @@ addPhoto() {
   formData.append('description', 'Opis zdjęcia');
   formData.append('file', file);
 
+  // Add location and creation_date if available
+  if (this.selectedCoords) {
+    formData.append('lat', this.selectedCoords.lat.toString());
+    formData.append('lon', this.selectedCoords.lng.toString());
+  }
+  // Example: precise date
+  formData.append('year', '2024');
+  formData.append('month', '5');
+  formData.append('day', '17');
+  // Or for year_range:
+  // formData.append('year_from', '2020');
+  // formData.append('year_to', '2024');
+
   this.mediaService.uploadMedia(formData).subscribe({
     next: (res: any) => {
       console.log('Media dodane:', res);

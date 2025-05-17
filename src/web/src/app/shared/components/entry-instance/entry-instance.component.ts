@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { DataInstance } from '../../interfaces/dataInstance';
+import { Media } from '../../interfaces/media';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -11,11 +11,11 @@ import { CommonModule } from '@angular/common';
 })
 export class EntryInstanceComponent{
 
-  @Input() data!: DataInstance;
+  @Input() data!: Media;
 
 
-  getImageUrl(photo: string): string {
-    return `assets/mockPhotos/${photo}`;
+  getImageUrl(): string {
+    return this.data.photos?.[0]?.thumbnail_url ?? '';
   }
 
 }
