@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { Media } from '../../interfaces/media';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../environments/environment';
+
 
 @Component({
   selector: 'app-entry-instance',
@@ -15,7 +17,11 @@ export class EntryInstanceComponent{
 
 
   getImageUrl(): string {
-    return this.data.photos?.[0]?.thumbnail_url ?? '';
+    return (
+    (this.data.photos?.[0]?.thumbnail_url
+      ? environment.apiUrl + this.data.photos[0].thumbnail_url
+      : '')
+  );
   }
 
 }

@@ -9,28 +9,9 @@ import { Media } from '../interfaces/media';
 export class MediaServiceService {
   constructor(private http: HttpClient) {}
 
-  search() {
-    let body = {
-      location: {
-        top_left: {
-          lon: 0,
-          lat: 100,
-        },
-        bottom_right: {
-          lon: 100,
-          lat: 0,
-        },
-      },
-      phrase: null,
-      creation_date: {
-        year_from: 2010,
-        year_to: 2020,
-      },
-      page: 0,
-      size: 10,
-    };
-
-    return this.http.post<Media[]>(`${environment.apiUrl}/search`, body);
+  search(params: any) {
+    // params should be the object with all search fields from the form
+    return this.http.post<Media[]>(`${environment.apiUrl}/search`, params);
   }
 
   uploadMedia(formData: FormData) {

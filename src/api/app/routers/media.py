@@ -65,8 +65,11 @@ def upload_img(
         location=location,
         creation_date=creation_date
     )
-    es.index(index="media_index", id=str(new_media.id), body=es_doc.model_dump())
+    print(new_media.id)
 
+    a = es.index(index="media_index", id=str(new_media.id), body=es_doc.model_dump())
+
+    print(a)
     return {"img_url": image_url}
 
 
