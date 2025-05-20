@@ -1,8 +1,9 @@
 import shutil
 import os
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.services.db.models import Media, Photo
+from app.services.db.models import Media, Photo, Comment, CommentPhoto
 from fastapi import UploadFile
+from datetime import datetime
 
 
 def save_file(file: UploadFile, destination: str):
@@ -46,3 +47,31 @@ def save_photo_metadata(
     session.commit()
     session.refresh(new_media)
     return new_media
+
+
+def save_new_comment_in_db(
+        media_id: int,
+        user_id: int,
+        comment_txt: str,
+        session
+    ):
+    media: Media = session.query(Media).filter(Media.id == media_id).first()
+    new_comment = Comment(
+        media_id=media_id,
+        user_id=user_id,
+        content=comment_txt,
+        created_at=datetime.utcnow()
+    )
+
+    session.add(new_comment)
+    session.flush()
+
+    comment_photo = CommentPhoto(
+        comment_id=new_comment.id,
+        photo_id=media.photo.id
+    )
+
+    session.add(comment_photo)
+    session.commit()
+    session.refresh(new_comment)
+    return new_comment

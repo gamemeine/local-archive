@@ -1,11 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Form
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Form, Path
 from app.services.db import get_database
 from app.services.media_service import (save_image, delete_image,
-                                        save_img_metadata_in_db)
+                                        save_img_metadata_in_db, add_comment_to_media)
 from app.services.es import get_elasticsearch, MediaDocument
 from app.services.es.models import Location, Coordinates, CreationDate, YearRange
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 
 router = APIRouter(
@@ -37,8 +37,8 @@ def upload_img(
     es=Depends(get_elasticsearch)
 ):
     image_url = save_image(file)
-    # Pass user_id=0 for now
-    new_media = save_img_metadata_in_db(file, title, description, image_url, db, user_id=0)
+    # TODO Pass user_id=1 for now
+    new_media = save_img_metadata_in_db(file, title, description, image_url, db, user_id=1)
 
     # Always provide a Location object
     if lat is not None and lon is not None:
@@ -72,6 +72,16 @@ def upload_img(
     print(a)
     return {"img_url": image_url}
 
+
+@router.post("/api/media/{media_id}/comments")
+def add_comment(
+    media_id: int = Path(...),
+    comment_txt: str = Form(...),
+    db: Session=Depends(get_database)
+    ):
+    user_id = 1 # TODO for now
+    added_comment = add_comment_to_media(media_id, user_id, comment_txt, db)
+    return {"New comment id": added_comment.id}
 
 @router.delete("/delete/{filename}")
 async def delete_img(filename: str):
