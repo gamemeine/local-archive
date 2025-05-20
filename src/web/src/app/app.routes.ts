@@ -7,6 +7,8 @@ import { BrowsingViewComponent } from './shared/views/browsing-view/browsing-vie
 import { AuthGuard } from '@auth0/auth0-angular';
 import { MyPhotosViewComponent } from './shared/views/my-photos-view/my-photos-view.component';
 import { AddPhotoComponent } from './shared/views/add-photo/add-photo.component';
+import { PhotoDetailViewComponent } from './shared/views/photo-detail-view/photo-detail-view.component';
+
 
 
 export const routes: Routes = [
@@ -29,6 +31,10 @@ export const routes: Routes = [
       {
         path: 'photos',
         component: MyPhotosViewComponent,
+      },
+      {
+        path: 'photo/:id',
+        component: PhotoDetailViewComponent,
       },
       {
         path: 'add-photos',
