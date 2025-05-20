@@ -6,6 +6,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ApprovalPopupComponent } from '../../components/approval-popup/approval-popup.component';
 import { Dialog } from '@angular/cdk/dialog';
+import { MediaServiceService } from '../../services/media-service.service';
+
 @Component({
   selector: 'app-add-photo',
   standalone: true,
@@ -15,7 +17,7 @@ import { Dialog } from '@angular/cdk/dialog';
 })
 export class AddPhotoComponent implements OnInit{
 
-  constructor(private mapboxService: AddressService, private dialog: Dialog) {}
+  constructor(private mapboxService: AddressService, private mediaService: MediaServiceService , private dialog: Dialog) {}
 
   preciseDate : boolean = true;
   preciseLocation : boolean = true;
@@ -85,7 +87,39 @@ changePhoto(direction: string){
 }
 
 addPhoto() {
-  this.dialog.open(ApprovalPopupComponent);
+  if (!this.imagePath[this.currentPhoto]) {
+    console.warn('Brak zdjęcia do wysłania.');
+    return;
+  }
+
+  const file = this.imagePath[this.currentPhoto];
+  const formData = new FormData();
+  formData.append('title', 'Tytuł zdjęcia');
+  formData.append('description', 'Opis zdjęcia');
+  formData.append('file', file);
+
+  // Add location and creation_date if available
+  if (this.selectedCoords) {
+    formData.append('lat', this.selectedCoords.lat.toString());
+    formData.append('lon', this.selectedCoords.lng.toString());
+  }
+  // Example: precise date
+  formData.append('year', '2024');
+  formData.append('month', '5');
+  formData.append('day', '17');
+  // Or for year_range:
+  // formData.append('year_from', '2020');
+  // formData.append('year_to', '2024');
+
+  this.mediaService.uploadMedia(formData).subscribe({
+    next: (res: any) => {
+      console.log('Media dodane:', res);
+      this.dialog.open(ApprovalPopupComponent);
+    },
+    error: (err: any) => {
+      console.error('Błąd podczas przesyłania media:', err);
+    }
+  });
 }
 
 }

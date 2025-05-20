@@ -14,10 +14,10 @@ export class MediaServiceService {
       location: {
         top_left: {
           lon: 0,
-          lat: 0,
+          lat: 90,
         },
         bottom_right: {
-          lon: 0,
+          lon: 90,
           lat: 0,
         },
       },
@@ -31,5 +31,9 @@ export class MediaServiceService {
     };
 
     return this.http.post<Media[]>(`${environment.apiUrl}/search`, body);
+  }
+
+  uploadMedia(formData: FormData) {
+    return this.http.post(`${environment.apiUrl}/media/upload`, formData);
   }
 }

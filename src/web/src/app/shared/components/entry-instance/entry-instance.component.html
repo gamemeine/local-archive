@@ -1,15 +1,28 @@
 <div class="entryDiv">
   <div class="dataDiv">
-    <div class="entry">Rok utworzenia:<br><span>{{data.year}}</span></div>
-    <div class="entry">Lokalizacja:<br><span>{{data.location}}</span></div>
-    <div class="entry">Kod pocztowy:<br><span>{{data.postalCode}}</span></div>
-    <div class="entry">Zawartość zdjęcia:<br><span>{{data.content}}</span></div>
+    <div class="entry">Rok utworzenia:<br>
+      <span>
+        {{
+          data.creation_date.year
+            || (data.creation_date.year_range ? data.creation_date.year_range.year_from : '')
+            || 'Brak'
+        }}
+      </span>
+    </div>
+    <div class="entry">Lokalizacja:<br>
+      <span>
+        {{ data.location.coordinates.lat }}, {{ data.location.coordinates.lon }}
+      </span>
+    </div>
+    <div class="entry">Zawartość zdjęcia:<br>
+      <span>{{ data.title || data.description }}</span>
+    </div>
   </div>
   <div class="photoDiv">
-    <div class="private" *ngIf="data.private">
+    <div class="private" *ngIf="data.privacy === 'private'">
       <h1>To zdjęcie jest prywatne</h1>
       <button class="askButton">Poproś o dostęp</button>
     </div>
-      <img [src]="getImageUrl(data.photo)" alt="{{data.content}}" *ngIf="!data.private"/>
+    <img [src]="getImageUrl()" alt="{{ data.title || data.description }}" *ngIf="data.privacy !== 'private'"/>
   </div>
 </div>
