@@ -1,0 +1,8 @@
+<h2>Zdjęcie ID: {{ photoId }}</h2>
+
+<h3>Komentarze:</h3>
+<ul>
+  <li *ngFor="let comment of comments">
+    <strong>{{ comment.author }}:</strong> {{ comment.text }}
+  </li>
+</ul>
