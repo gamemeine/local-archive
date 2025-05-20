@@ -1,8 +1,27 @@
 <h2>Zdjęcie ID: {{ photoId }}</h2>
 
-<h3>Komentarze:</h3>
-<ul>
-  <li *ngFor="let comment of comments">
-    <strong>{{ comment.author }}:</strong> {{ comment.text }}
-  </li>
-</ul>
+
+<!-- <div class="photo-section">
+    <img [src]="localhost:5002/photoId" [alt]="photo.title" class="photo-img" />
+    <div class="photo-details">
+      <h3>{{ photo.title }}</h3>
+      <p>{{ photo.description }}</p>
+    </div>
+</div> -->
+
+
+<div class="comments-section">
+    <h3>Komentarze:</h3>
+    <ul>
+      <li *ngFor="let comment of comments" class="comment">
+        <strong>{{ comment.author }}:</strong> {{ comment.text }}
+      </li>
+    </ul>
+
+    <div class="comment-form">
+      <h4>Dodaj komentarz</h4>
+      <input [(ngModel)]="newAuthor" placeholder="Twoje imię" /><br />
+      <textarea [(ngModel)]="newText" placeholder="Twój komentarz"></textarea><br />
+      <button (click)="addComment()">Wyślij</button>
+    </div>
+</div>
