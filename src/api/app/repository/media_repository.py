@@ -10,7 +10,7 @@ def save_file(file: UploadFile, destination: str):
         shutil.copyfileobj(file.file, out_file)
 
 
-async def delete_file(filepath: str) -> bool:
+def delete_file(filepath: str) -> bool:
     if os.path.exists(filepath):
         os.remove(filepath)
         return True
