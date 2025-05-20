@@ -1,7 +1,7 @@
 from sqlalchemy import (Column, Integer, String, Text,
                         DateTime, Boolean, ForeignKey, Float, DECIMAL)
 from sqlalchemy.orm import declarative_base, relationship
-from datetime import datetime
+from datetime import datetime, timezone
 
 Base = declarative_base()
 
@@ -31,9 +31,8 @@ class Media(Base):
     title = Column(String(255))
     description = Column(Text)
     privacy = Column(String(50), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow,
-                        onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     photo = relationship("Photo", back_populates="media", uselist=False)
 
@@ -41,7 +40,7 @@ class Media(Base):
 class Photo(Base):
     __tablename__ = 'photo'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(128), primary_key=True)
     media_id = Column(Integer, ForeignKey('media.id'))
     file_url = Column(String(255), nullable=False)
     thumbnail_url = Column(String(255), nullable=False)
@@ -66,7 +65,7 @@ class CommentPhoto(Base):
     __tablename__ = 'comment_photo'
 
     comment_id = Column(Integer, ForeignKey('comment.id'), primary_key=True)
-    photo_id = Column(Integer, ForeignKey('photo.id'), primary_key=True)
+    photo_id = Column(String(128), ForeignKey('photo.id'), primary_key=True)
 
 
 class Reaction(Base):
@@ -121,7 +120,7 @@ class ReportPhoto(Base):
     __tablename__ = 'report_photo'
 
     report_id = Column(Integer, ForeignKey('report.id'), primary_key=True)
-    photo_id = Column(Integer, ForeignKey('photo.id'), primary_key=True)
+    photo_id = Column(String(128), ForeignKey('photo.id'), primary_key=True)
 
 
 class Revision(Base):

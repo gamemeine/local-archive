@@ -6,120 +6,125 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ApprovalPopupComponent } from '../../components/approval-popup/approval-popup.component';
 import { Dialog } from '@angular/cdk/dialog';
-import { MediaServiceService } from '../../services/media-service.service';
+import { MediaServiceService } from '../../services/media.service';
 
 @Component({
   selector: 'app-add-photo',
   standalone: true,
-  imports: [CommonModule, MapPickerComponent, HttpClientModule, FormsModule],
+  imports: [
+    CommonModule,
+    MapPickerComponent,
+    HttpClientModule,
+    FormsModule,
+    ApprovalPopupComponent,
+  ],
   templateUrl: './add-photo.component.html',
-  styleUrl: './add-photo.component.scss'
+  styleUrl: './add-photo.component.scss',
 })
-export class AddPhotoComponent implements OnInit{
+export class AddPhotoComponent implements OnInit {
+  preciseDate = true;
+  preciseLocation = true;
 
-  constructor(private mapboxService: AddressService, private mediaService: MediaServiceService , private dialog: Dialog) {}
+  url: string | ArrayBuffer | null = null;
+  imagePath: File[] = [];
+  message = '';
+  reader = new FileReader();
+  currentPhoto = 0;
+  address = '';
+  selectedCoords?: { lat: number; lng: number };
 
-  preciseDate : boolean = true;
-  preciseLocation : boolean = true;
+  // TODO: replace with real user ID from your auth context
+  currentUserId = 'user-123';
+
+  constructor(
+    private mapboxService: AddressService,
+    private mediaService: MediaServiceService,
+    private dialog: Dialog
+  ) {}
 
   ngOnInit(): void {
-      console.log(HttpClientModule)
+    // debugging only
+    console.log('AddPhotoComponent initialized');
   }
-
-  url: any;
-  imagePath: any = [];
-  message: string = '';
-  reader = new FileReader();
-  currentPhoto : number = 0;
-  address: string = '';
-
-  selectedCoords?: { lat: number; lng: number };
 
   onCoordsPicked(coords: { lat: number; lng: number }) {
     this.selectedCoords = coords;
-    this.mapboxService.reverseGeocode(coords.lat, coords.lng).subscribe((res) => {
-      if (res.features.length > 0) {
-        this.address = res.features[0].place_name;
-      } else {
-        this.address = 'Address not found';
-      }
-    });
+    this.mapboxService
+      .reverseGeocode(coords.lat, coords.lng)
+      .subscribe((res) => {
+        this.address =
+          res.features.length > 0
+            ? res.features[0].place_name
+            : 'Address not found';
+      });
   }
 
-
-  onFileChanged(event : any) {
-    const files = event.target.files;
-    if (files.length === 0)
-        return;
-
-    const mimeType = files[0].type;
-    if (mimeType.match(/image\/*/) == null) {
-        this.message = "Only images are supported.";
-        return;
+  onFileChanged(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      return;
     }
-
-    this.imagePath = files;
-    this.reader.readAsDataURL(files[0]);
-    this.reader.onload = (_event) => {
-        this.url = this.reader.result;
+    const file = input.files[0];
+    if (!file.type.match(/image\/*/)) {
+      this.message = 'Only images are supported.';
+      return;
     }
-}
+    this.imagePath = Array.from(input.files);
+    this.currentPhoto = 0;
+    this.reader.readAsDataURL(this.imagePath[0]);
+    this.reader.onload = () => {
+      this.url = this.reader.result;
+    };
+  }
 
-changePhoto(direction: string){
-  if (direction === 'left') {
-    if(this.currentPhoto !== 0) {
+  changePhoto(direction: 'left' | 'right') {
+    if (direction === 'left' && this.currentPhoto > 0) {
       this.currentPhoto--;
-    this.reader.readAsDataURL(this.imagePath[this.currentPhoto]);
-    this.reader.onload = (_event) => {
-        this.url = this.reader.result;
-    }
-  }
-}
-  else if (direction === 'right') {
-    if(this.currentPhoto !== this.imagePath.length - 1) {
+    } else if (
+      direction === 'right' &&
+      this.currentPhoto < this.imagePath.length - 1
+    ) {
       this.currentPhoto++;
-      this.reader.readAsDataURL(this.imagePath[this.currentPhoto]);
-      this.reader.onload = (_event) => {
-          this.url = this.reader.result;
-      }
-  }
-}
-}
-
-addPhoto() {
-  if (!this.imagePath[this.currentPhoto]) {
-    console.warn('Brak zdjęcia do wysłania.');
-    return;
-  }
-
-  const file = this.imagePath[this.currentPhoto];
-  const formData = new FormData();
-  formData.append('title', 'Tytuł zdjęcia');
-  formData.append('description', 'Opis zdjęcia');
-  formData.append('file', file);
-
-  // Add location and creation_date if available
-  if (this.selectedCoords) {
-    formData.append('lat', this.selectedCoords.lat.toString());
-    formData.append('lon', this.selectedCoords.lng.toString());
-  }
-  // Example: precise date
-  formData.append('year', '2024');
-  formData.append('month', '5');
-  formData.append('day', '17');
-  // Or for year_range:
-  // formData.append('year_from', '2020');
-  // formData.append('year_to', '2024');
-
-  this.mediaService.uploadMedia(formData).subscribe({
-    next: (res: any) => {
-      console.log('Media dodane:', res);
-      this.dialog.open(ApprovalPopupComponent);
-    },
-    error: (err: any) => {
-      console.error('Błąd podczas przesyłania media:', err);
+    } else {
+      return;
     }
-  });
-}
+    const file = this.imagePath[this.currentPhoto];
+    this.reader.readAsDataURL(file);
+    this.reader.onload = () => {
+      this.url = this.reader.result;
+    };
+  }
 
+  async addPhoto() {
+    if (this.imagePath.length === 0) {
+      console.warn('No photo to upload.');
+      return;
+    }
+    const images = this.imagePath;
+    const title = 'Tytuł zdjęcia';
+    const description = 'Opis zdjęcia';
+    const privacy = 'public'; // or 'private'
+    const content = this.address; // map address or other content
+    const latitude = this.selectedCoords?.lat ?? 0;
+    const longitude = this.selectedCoords?.lng ?? 0;
+    const creationDate = '2024-05-17'; // or build dynamically
+
+    try{
+      const result = await this.mediaService.uploadMedia({
+        title,
+        description,
+        privacy,
+        content,
+        latitude,
+        longitude,
+        creation_date: creationDate,
+        images,
+      })
+      this.dialog.open(ApprovalPopupComponent);
+      console.log('Upload result:', result);
+    } catch (error) {
+      console.error('Error uploading media:', error);
+      this.message = 'Error uploading media. Please try again.';
+    }
+  }
 }
