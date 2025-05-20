@@ -2,7 +2,6 @@ from fastapi import UploadFile
 import os
 from app.repository.media_repository import save_file, delete_file, save_photo_metadata
 from app.config import settings
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 def save_image(file: UploadFile) -> str:

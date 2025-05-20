@@ -5,7 +5,6 @@ from app.services.media_service import (save_image, delete_image,
 from app.services.es import get_elasticsearch, MediaDocument
 from app.services.es.models import Location, Coordinates, CreationDate, YearRange
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 router = APIRouter(

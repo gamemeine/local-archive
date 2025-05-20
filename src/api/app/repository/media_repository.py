@@ -1,6 +1,5 @@
 import shutil
 import os
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.db.models import Media, Photo
 from fastapi import UploadFile
 
