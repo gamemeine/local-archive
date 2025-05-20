@@ -9,7 +9,7 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    id = Column(String(128), primary_key=True, index=True)
     email = Column(String(255), nullable=False)
     first_name = Column(String(100))
     last_name = Column(String(100))
@@ -27,7 +27,7 @@ class Media(Base):
     __tablename__ = 'media'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(String(128), ForeignKey('users.id'))
     title = Column(String(255))
     description = Column(Text)
     privacy = Column(String(50), nullable=False)
@@ -57,7 +57,7 @@ class Comment(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     media_id = Column(Integer, ForeignKey('media.id'))
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(String(128), ForeignKey('users.id'))
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -74,7 +74,7 @@ class Reaction(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     media_id = Column(Integer, ForeignKey('media.id'))
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(String(128), ForeignKey('users.id'))
     type = Column(String(20))
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -84,7 +84,7 @@ class AccessRequest(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     media_id = Column(Integer, ForeignKey('media.id'))
-    requester_id = Column(Integer, ForeignKey('users.id'))
+    requester_id = Column(String(128), ForeignKey('users.id'))
     justification = Column(Text)
     status = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -96,7 +96,7 @@ class AuditLog(Base):
     __tablename__ = 'audit_log'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    user_id = Column(String(128), ForeignKey('users.id'), nullable=True)
     action_type = Column(String(100))
     entity = Column(String(100))
     entity_id = Column(Integer)
@@ -108,7 +108,7 @@ class Report(Base):
     __tablename__ = 'report'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    reporter_id = Column(Integer, ForeignKey('users.id'))
+    reporter_id = Column(String(128), ForeignKey('users.id'))
     media_id = Column(Integer, ForeignKey('media.id'))
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -129,7 +129,7 @@ class Revision(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     media_id = Column(Integer, ForeignKey('media.id'))
-    changed_by = Column(Integer, ForeignKey('users.id'))
+    changed_by = Column(String(128), ForeignKey('users.id'))
     change_type = Column(String(50))
     change_date = Column(DateTime, default=datetime.utcnow)
     change_details = Column(Text)
