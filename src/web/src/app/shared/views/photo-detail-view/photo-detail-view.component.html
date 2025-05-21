@@ -1,27 +1,30 @@
 <h2>Zdjęcie ID: {{ photoId }}</h2>
 
-
-<!-- <div class="photo-section">
-    <img [src]="localhost:5002/photoId" [alt]="photo.title" class="photo-img" />
-    <div class="photo-details">
-      <h3>{{ photo.title }}</h3>
-      <p>{{ photo.description }}</p>
-    </div>
-</div> -->
-
-
 <div class="comments-section">
-    <h3>Komentarze:</h3>
-    <ul>
-      <li *ngFor="let comment of comments" class="comment">
-        <strong>{{ comment.author }}:</strong> {{ comment.text }}
-      </li>
-    </ul>
+  <h3>Komentarze:</h3>
 
-    <div class="comment-form">
-      <h4>Dodaj komentarz</h4>
-      <input [(ngModel)]="newAuthor" placeholder="Twoje imię" /><br />
-      <textarea [(ngModel)]="newText" placeholder="Twój komentarz"></textarea><br />
-      <button (click)="addComment()">Wyślij</button>
-    </div>
+  <ul *ngIf="comments.length > 0; else brakKomentarzy">
+    <li *ngFor="let comment of comments" class="comment">
+      <strong>{{ comment.author_name || 'Użytkownik #' + comment.user_id }}:</strong>
+      {{ comment.content }}
+      <br />
+      <small>{{ comment.created_at | date: 'short' }}</small>
+    </li>
+  </ul>
+
+  <ng-template #brakKomentarzy>
+    <p>Brak komentarzy.</p>
+  </ng-template>
+
+  <div class="comment-form">
+    <h4>Dodaj komentarz</h4>
+    <textarea
+      [(ngModel)]="newText"
+      placeholder="Twój komentarz"
+      rows="4"
+      cols="40"
+    ></textarea>
+    <br />
+    <button (click)="addComment()" [disabled]="!newText.trim()">Wyślij</button>
+  </div>
 </div>

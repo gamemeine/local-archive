@@ -75,7 +75,7 @@ def upload_img(
     return {"img_url": image_url}
 
 
-@router.post("/api/media/{media_id}/comments")
+@router.post("/{media_id}/comments")
 def add_comment(
     media_id: int = Path(...),
     comment_txt: str = Form(...),
@@ -85,7 +85,7 @@ def add_comment(
     added_comment = add_comment_to_media(media_id, user_id, comment_txt, db)
     return {"New comment id": added_comment.id}
 
-@router.get("/api/media/{media_id}/comments")
+@router.get("/{media_id}/comments")
 def get_comments(
     media_id: int = Path(...),
     db: Session=Depends(get_database)

@@ -15,7 +15,6 @@ export class PhotoDetailViewComponent implements OnInit {
   photoId!: number;
   comments: Comment[] = [];
 
-  newAuthor = '';
   newText = '';
 
   constructor(private route: ActivatedRoute, private commentService : CommentService) {}
@@ -23,6 +22,7 @@ export class PhotoDetailViewComponent implements OnInit {
   ngOnInit(): void {
     this.photoId = Number(this.route.snapshot.paramMap.get('id'));
     console.log('Załadowano zdjęcie ID:', this.photoId);
+    this.loadComments()
   }
 
   loadComments() {
@@ -32,12 +32,9 @@ export class PhotoDetailViewComponent implements OnInit {
   }
 
   addComment() {
-    if (!this.newAuthor || !this.newText) return;
+    if (!this.newText) return;
 
-    const newComment = { author: this.newAuthor, text: this.newText };
-
-    this.commentService.addComment(this.photoId, newComment).subscribe(() => {
-      this.newAuthor = '';
+    this.commentService.addComment(this.photoId, this.newText).subscribe(() => {
       this.newText = '';
       this.loadComments();
     });
