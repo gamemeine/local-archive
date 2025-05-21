@@ -58,6 +58,8 @@ async def search(request: MediaSearchRequest, client=Depends(get_elasticsearch))
     body = get_query(request.location, request.phrase, request.creation_date, request.page, request.size)
     result = client.search(index="media_index", body=body)
 
+    print(body)
+
     media = []
     for hit in result["hits"]["hits"]:
         document = MediaDocument(**hit["_source"])

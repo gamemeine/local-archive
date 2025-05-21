@@ -4,7 +4,7 @@ import { MockPhotos } from '../../mocks/mockPhotos';
 import { CommonModule } from '@angular/common';
 import { DataInstance } from '../../interfaces/dataInstance';
 import { SearchbarComponent } from '../searchbar/searchbar.component';
-import { MediaServiceService } from '../../services/media-service.service';
+import { MediaServiceService } from '../../services/media.service';
 import { Media } from '../../interfaces/media';
 import { PhotoServiceService } from '../../services/photo-service.service';
 import { Subscription } from 'rxjs';

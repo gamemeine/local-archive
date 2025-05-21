@@ -1,7 +1,8 @@
+import uuid
 from sqlalchemy import (Column, Integer, String, Text,
                         DateTime, Boolean, ForeignKey, Float, DECIMAL)
 from sqlalchemy.orm import declarative_base, relationship
-from datetime import datetime
+from datetime import datetime, timezone
 
 Base = declarative_base()
 
@@ -9,7 +10,7 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    id = Column(String(128), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     email = Column(String(255), nullable=False)
     first_name = Column(String(100))
     last_name = Column(String(100))
@@ -27,13 +28,12 @@ class Media(Base):
     __tablename__ = 'media'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(String(128), ForeignKey('users.id'))
     title = Column(String(255))
     description = Column(Text)
     privacy = Column(String(50), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow,
-                        onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     photo = relationship("Photo", back_populates="media", uselist=False)
 
@@ -41,7 +41,7 @@ class Media(Base):
 class Photo(Base):
     __tablename__ = 'photo'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(128), primary_key=True)
     media_id = Column(Integer, ForeignKey('media.id'))
     file_url = Column(String(255), nullable=False)
     thumbnail_url = Column(String(255), nullable=False)
@@ -57,7 +57,7 @@ class Comment(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     media_id = Column(Integer, ForeignKey('media.id'))
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(String(128), ForeignKey('users.id'))
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -66,7 +66,7 @@ class CommentPhoto(Base):
     __tablename__ = 'comment_photo'
 
     comment_id = Column(Integer, ForeignKey('comment.id'), primary_key=True)
-    photo_id = Column(Integer, ForeignKey('photo.id'), primary_key=True)
+    photo_id = Column(String(128), ForeignKey('photo.id'), primary_key=True)
 
 
 class Reaction(Base):
@@ -74,7 +74,7 @@ class Reaction(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     media_id = Column(Integer, ForeignKey('media.id'))
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(String(128), ForeignKey('users.id'))
     type = Column(String(20))
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -84,7 +84,7 @@ class AccessRequest(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     media_id = Column(Integer, ForeignKey('media.id'))
-    requester_id = Column(Integer, ForeignKey('users.id'))
+    requester_id = Column(String(128), ForeignKey('users.id'))
     justification = Column(Text)
     status = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -96,7 +96,7 @@ class AuditLog(Base):
     __tablename__ = 'audit_log'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    user_id = Column(String(128), ForeignKey('users.id'), nullable=True)
     action_type = Column(String(100))
     entity = Column(String(100))
     entity_id = Column(Integer)
@@ -108,7 +108,7 @@ class Report(Base):
     __tablename__ = 'report'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    reporter_id = Column(Integer, ForeignKey('users.id'))
+    reporter_id = Column(String(128), ForeignKey('users.id'))
     media_id = Column(Integer, ForeignKey('media.id'))
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -121,7 +121,7 @@ class ReportPhoto(Base):
     __tablename__ = 'report_photo'
 
     report_id = Column(Integer, ForeignKey('report.id'), primary_key=True)
-    photo_id = Column(Integer, ForeignKey('photo.id'), primary_key=True)
+    photo_id = Column(String(128), ForeignKey('photo.id'), primary_key=True)
 
 
 class Revision(Base):
@@ -129,7 +129,7 @@ class Revision(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     media_id = Column(Integer, ForeignKey('media.id'))
-    changed_by = Column(Integer, ForeignKey('users.id'))
+    changed_by = Column(String(128), ForeignKey('users.id'))
     change_type = Column(String(50))
     change_date = Column(DateTime, default=datetime.utcnow)
     change_details = Column(Text)
