@@ -2,13 +2,25 @@ from fastapi import APIRouter, UploadFile, File, Depends, Form
 from app.services.db.models import CreationDate, Location, Media, PhotoContent
 from app.services.db import get_database
 from app.services.es import get_elasticsearch
-from app.services.media_service import add_media, delete_media
+from app.services.media_service import add_media, delete_media, get_media
 
 
 router = APIRouter(
     prefix="/media",
     tags=["media"],
 )
+
+
+@router.get("/{media_id}")
+def find(
+    media_id: str,
+    db=Depends(get_database)
+):
+    """
+    Get media by ID.
+    """
+    medium = get_media(db, media_id)
+    return medium
 
 
 class UploadMediaRequest:
