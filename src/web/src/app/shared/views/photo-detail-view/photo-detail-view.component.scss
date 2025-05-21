@@ -1,0 +1,19 @@
+.comments-section {
+  background-color: #eaeaea;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.comment {
+  background-color: #ffffff;
+  color: #333333;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.comment strong {
+  color: #0055aa;
+  font-weight: 600;
+}

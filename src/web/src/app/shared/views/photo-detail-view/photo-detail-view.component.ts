@@ -10,6 +10,7 @@ import { Comment } from '../../interfaces/comment'
   standalone: true,
   imports: [RouterModule, FormsModule, CommonModule],
   templateUrl: './photo-detail-view.component.html',
+  styleUrl:  './photo-detail-view.component.scss'
 })
 export class PhotoDetailViewComponent implements OnInit {
   photoId!: number;
