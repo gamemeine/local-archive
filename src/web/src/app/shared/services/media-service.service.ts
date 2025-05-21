@@ -24,7 +24,7 @@ export class MediaServiceService {
       phrase: null,
       creation_date: {
         year_from: 2010,
-        year_to: 2020,
+        year_to: 2026,
       },
       page: 0,
       size: 10,

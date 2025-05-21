@@ -1,12 +1,12 @@
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Form, Path
 from app.services.db import get_database
 from app.services.media_service import (save_image, delete_image,
-                                        save_img_metadata_in_db, add_comment_to_media)
+                                        save_img_metadata_in_db, add_comment_to_media,
+                                        get_media_comments)
 from app.services.es import get_elasticsearch, MediaDocument
 from app.services.es.models import Location, Coordinates, CreationDate, YearRange
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-
 
 router = APIRouter(
     prefix="/media",
@@ -18,8 +18,10 @@ router = APIRouter(
 def get_media(db=Depends(get_database)):
     query = text("SELECT * FROM media")
     result = db.execute(query)
-    return result.fetchall()
-
+    rows = result.fetchall()
+    for row in rows:
+        print(type(row), row)
+    return [dict(row._mapping) for row in rows]
 
 @router.post("/upload")
 def upload_img(
@@ -55,7 +57,7 @@ def upload_img(
 
     es_doc = MediaDocument(
         id=new_media.id,
-        user_id=new_media.user_id or 0,  # fallback to 0 if None
+        user_id=new_media.user_id or 1,  # fallback to 1 if None
         title=title,
         description=description,
         privacy=new_media.privacy,
@@ -82,6 +84,13 @@ def add_comment(
     user_id = 1 # TODO for now
     added_comment = add_comment_to_media(media_id, user_id, comment_txt, db)
     return {"New comment id": added_comment.id}
+
+@router.get("/api/media/{media_id}/comments")
+def get_comments(
+    media_id: int = Path(...),
+    db: Session=Depends(get_database)
+    ):
+    return get_media_comments(media_id, db)
 
 @router.delete("/delete/{filename}")
 async def delete_img(filename: str):

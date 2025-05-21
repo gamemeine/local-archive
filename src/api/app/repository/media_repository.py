@@ -39,7 +39,7 @@ def save_photo_metadata(
     new_photo = Photo(
         media_id=new_media.id,
         file_url=url,
-        thumbnail_url="abc",
+        thumbnail_url=url, # TODO only for now
         storage_provider="LocalStorageProvider",
         file_size=size
     )
@@ -75,3 +75,10 @@ def save_new_comment_in_db(
     session.commit()
     session.refresh(new_comment)
     return new_comment
+
+
+def get_media_comments_from_db(
+        media_id: int,
+        session):
+    comments = session.query(Comment).filter(Comment.media_id == media_id).all()
+    return comments
