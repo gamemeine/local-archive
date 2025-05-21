@@ -32,10 +32,10 @@ export class PhotoDetailViewComponent implements OnInit {
     });
   }
 
-  addComment() {
+  async addComment() {
     if (!this.newText) return;
 
-    this.commentService.addComment(this.photoId, this.newText).subscribe(() => {
+    (await this.commentService.addComment(this.photoId, this.newText)).subscribe(() => {
       this.newText = '';
       this.loadComments();
     });

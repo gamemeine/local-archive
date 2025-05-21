@@ -1,6 +1,5 @@
 import shutil
 import os
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.db.models import Media, Photo, Comment, CommentPhoto
 from fastapi import UploadFile
 from datetime import datetime
@@ -12,7 +11,7 @@ def save_file(file: UploadFile, destination: str):
         shutil.copyfileobj(file.file, out_file)
 
 
-async def delete_file(filepath: str) -> bool:
+def delete_file(filepath: str) -> bool:
     if os.path.exists(filepath):
         os.remove(filepath)
         return True
@@ -49,13 +48,20 @@ def save_photo_metadata(
     return new_media
 
 
-def save_new_comment_in_db(
-        media_id: int,
-        user_id: int,
-        comment_txt: str,
-        session
-    ):
-    media: Media = session.query(Media).filter(Media.id == media_id).first()
+def save_new_comment_in_db(media_id: int, user_id: int, comment_txt: str, session):
+    media = (
+        session.query(Media)
+        .outerjoin(Photo, Media.id == Photo.media_id)
+        .filter(Media.id == media_id)
+        .first()
+    )
+
+    if not media:
+        raise ValueError("Media not found")
+
+    if not media.photo:
+        raise ValueError("Photo not associated with this media")
+
     new_comment = Comment(
         media_id=media_id,
         user_id=user_id,
@@ -64,7 +70,7 @@ def save_new_comment_in_db(
     )
 
     session.add(new_comment)
-    session.flush()
+    session.flush()  # Ensures new_comment.id is available
 
     comment_photo = CommentPhoto(
         comment_id=new_comment.id,
