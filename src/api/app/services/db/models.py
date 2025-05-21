@@ -61,6 +61,8 @@ class Comment(Base):
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    user = relationship("User")
+
 
 class CommentPhoto(Base):
     __tablename__ = 'comment_photo'
