@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy import (Column, Integer, String, Text,
                         DateTime, Boolean, ForeignKey, Float, DECIMAL)
 from sqlalchemy.orm import declarative_base, relationship
@@ -9,7 +10,7 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(String(128), primary_key=True, index=True)
+    id = Column(String(128), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     email = Column(String(255), nullable=False)
     first_name = Column(String(100))
     last_name = Column(String(100))
