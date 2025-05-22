@@ -90,16 +90,17 @@ class AddCommentRequest(BaseModel):
 def add_comment(
     media_id: int,
     request: AddCommentRequest,
-    db: Session=Depends(get_database)
-    ):
+    db: Session = Depends(get_database)
+):
     added_comment = add_comment_to_media(media_id, request.user_id, request.text, db)
     return {"New comment id": added_comment.id}
+
 
 @router.get("/{media_id}/comments", response_model=List[CommentOut])
 def get_comments(
     media_id: int = Path(...),
-    db: Session=Depends(get_database)
-    ):
+    db: Session = Depends(get_database)
+):
     comments = get_media_comments(media_id, db)
     return [
         CommentOut(
@@ -111,6 +112,7 @@ def get_comments(
         )
         for comment in comments
     ]
+
 
 @router.delete("/{media_id}")
 def delete(

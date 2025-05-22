@@ -71,8 +71,6 @@ class CommentPhoto(Base):
     photo_id = Column(String(128), ForeignKey('photo.id'), primary_key=True)
 
 
-
-
 class Reaction(Base):
     __tablename__ = 'reaction'
 

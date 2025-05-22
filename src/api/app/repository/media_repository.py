@@ -38,7 +38,7 @@ def save_photo_metadata(
     new_photo = Photo(
         media_id=new_media.id,
         file_url=url,
-        thumbnail_url=url, # TODO only for now
+        thumbnail_url=url,  # TODO only for now
         storage_provider="LocalStorageProvider",
         file_size=size
     )
