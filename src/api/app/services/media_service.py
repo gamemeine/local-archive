@@ -5,8 +5,11 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session, joinedload
 from elasticsearch import Elasticsearch
 from app.config import settings
-from app.services.db.models import Media, Photo, PhotoContent, PredefinedMetadata, Location, CreationDate
-from app.repository.media_repository import save_file, delete_file
+from app.services.db.models import (Media, Photo, PhotoContent,
+                                    PredefinedMetadata, Location, CreationDate)
+from app.repository.media_repository import (save_file, delete_file,
+                                             save_new_comment_in_db,
+                                             get_media_comments_from_db)
 from app.services.es.documents import MediaDocument
 from app.services.es.models import (
     Photo as ElasticPhoto,
@@ -78,6 +81,8 @@ def add_media(
     """
     # Save to database and storage
     db.add(medium)
+    db.commit()
+    db.refresh(medium)
 
     photos = []
     for image_file in images:
@@ -94,7 +99,6 @@ def add_media(
         photos.append(photo)
 
     db.commit()
-    db.refresh(medium)
 
     def add_metadata(metadata, metadata_type):
         metadata_instance = PredefinedMetadata(media_id=medium.id, metadata_type=metadata_type)
@@ -151,5 +155,18 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
     # Delete files from storage
     for photo in medium.photos:
         delete_file(photo.file_url)
-
     return True
+
+
+def add_comment_to_media(media_id: int, user_id: int, comment_txt: str, db):
+    return save_new_comment_in_db(media_id, user_id, comment_txt, db)
+
+
+def get_media_comments(media_id: int, db):
+    return get_media_comments_from_db(media_id, db)
+
+
+def delete_image(filename: str) -> bool:
+    filepath = os.path.join(settings.upload_dir, filename)
+    res = delete_file(filepath)
+    return res
