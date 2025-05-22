@@ -6,6 +6,7 @@ from app.services.db.comment_out import CommentOut
 from app.services.media_service import (
     add_media,
     delete_media,
+    get_media,
     add_comment_to_media,
     get_media_comments
 )
@@ -17,6 +18,18 @@ router = APIRouter(
     prefix="/media",
     tags=["media"],
 )
+
+
+@router.get("/{media_id}")
+def find(
+    media_id: str,
+    db=Depends(get_database)
+):
+    """
+    Get media by ID.
+    """
+    medium = get_media(db, media_id)
+    return medium
 
 
 class UploadMediaRequest:

@@ -2,7 +2,7 @@ import os
 import uuid
 from fastapi import UploadFile
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from elasticsearch import Elasticsearch
 from app.config import settings
 from app.services.db.models import Media, Photo, PhotoContent, PredefinedMetadata, Location, CreationDate
@@ -47,6 +47,21 @@ def _get_image(id: str) -> ImageDescriptor:
         storage_provider='local',
         file_size=size
     )
+
+
+def get_media(db: Session, media_id: int) -> Media:
+    """
+    Get media by ID.
+    """
+    media = (
+        db.query(Media)
+        .options(joinedload(Media.photo))
+        .filter(Media.id == media_id)
+        .first()
+    )
+    if not media:
+        raise ValueError(f"Media with id {media_id} not found")
+    return media
 
 
 def add_media(
