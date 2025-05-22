@@ -5,8 +5,11 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session, joinedload
 from elasticsearch import Elasticsearch
 from app.config import settings
-from app.services.db.models import Media, Photo, PhotoContent, PredefinedMetadata, Location, CreationDate
-from app.repository.media_repository import save_file, delete_file, save_new_comment_in_db, get_media_comments_from_db
+from app.services.db.models import (Media, Photo, PhotoContent,
+                                    PredefinedMetadata, Location, CreationDate)
+from app.repository.media_repository import (save_file, delete_file,
+                                             save_new_comment_in_db,
+                                             get_media_comments_from_db)
 from app.services.es.documents import MediaDocument
 from app.services.es.models import (
     Photo as ElasticPhoto,
@@ -154,11 +157,14 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
         delete_file(photo.file_url)
     return True
 
+
 def add_comment_to_media(media_id: int, user_id: int, comment_txt: str, db):
     return save_new_comment_in_db(media_id, user_id, comment_txt, db)
 
+
 def get_media_comments(media_id: int, db):
     return get_media_comments_from_db(media_id, db)
+
 
 def delete_image(filename: str) -> bool:
     filepath = os.path.join(settings.upload_dir, filename)
