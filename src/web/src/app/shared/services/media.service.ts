@@ -4,7 +4,7 @@ import { environment } from '../../../environments/environment';
 import { Media } from '../interfaces/media';
 import { firstValueFrom, Observable } from 'rxjs';
 import { UsersService } from './users.service';
-
+import { BehaviorSubject } from 'rxjs';
 interface UploadMediaRequest {
   title: string;
   description: string;
@@ -22,17 +22,24 @@ interface UploadMediaRequest {
 export class MediaServiceService {
   constructor(private http: HttpClient, private userService: UsersService) {}
 
-  search() {
+  currentMedia: Observable<Media[]> | any;
+  private currentMediaSubject = new BehaviorSubject<Media[]>([]);
+  public currentMedia$ = this.currentMediaSubject.asObservable();
+
+  search(
+    tl_tuple: any = {
+      lon: 0,
+      lat: 90,
+    },
+    br_tuple: any = {
+      lon: 90,
+      lat: 0,
+    }
+  ): Observable<Media[]> {
     let body = {
       location: {
-        top_left: {
-          lon: 0,
-          lat: 90,
-        },
-        bottom_right: {
-          lon: 90,
-          lat: 0,
-        },
+        top_left: tl_tuple,
+        bottom_right: br_tuple,
       },
       phrase: null,
       creation_date: {
@@ -43,10 +50,16 @@ export class MediaServiceService {
       size: 10,
     };
 
-    return this.http.post<Media[]>(`${environment.apiUrl}/search`, body);
+    const request = this.http.post<Media[]>(
+      `${environment.apiUrl}/search`,
+      body
+    );
+
+    request.subscribe((media) => this.currentMediaSubject.next(media));
+    return request;
   }
 
-  async uploadMedia(request: UploadMediaRequest,): Promise<any> {
+  async uploadMedia(request: UploadMediaRequest): Promise<any> {
     const formData = new FormData();
     request.images.forEach((file) => formData.append('images', file));
     formData.append('title', request.title);

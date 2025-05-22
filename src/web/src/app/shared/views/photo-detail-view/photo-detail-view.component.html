@@ -1,23 +1,17 @@
-<h2>Zdjęcie ID: {{ photoId }}</h2>
-
+<!-- <h2>Zdjęcie ID: {{ photoId }}</h2> -->
+<div class="photoContainer">
+  <div class="image">
+    <img src="{{picture}}" alt="photo" width="100px">
+  </div>
+  <div class="data">
+    <h2>{{ photoData.title }}</h2>
+    <p><strong>Opis:</strong> {{ photoData.description }}</p>
+    <p><strong>Data dodania:</strong> {{ photoData.created_at | date: 'short' }}</p>
+    <p><strong>Autor:</strong> {{ photoData.user_id || 'Użytkownik #' + photoData }}</p>
+  </div>
+</div>
 <div class="comments-section">
-  <h3>Komentarze:</h3>
-
-  <ul *ngIf="comments.length > 0; else brakKomentarzy">
-    <li *ngFor="let comment of comments" class="comment">
-      <strong>{{ comment.author_name || 'Użytkownik #' + comment.user_id }}:</strong>
-      {{ comment.content }}
-      <br />
-      <small>{{ comment.created_at | date: 'short' }}</small>
-    </li>
-  </ul>
-
-  <ng-template #brakKomentarzy>
-    <p>Brak komentarzy.</p>
-  </ng-template>
-
-  <div class="comment-form">
-    <h4>Dodaj komentarz</h4>
+    <div class="comment-form">
     <textarea
       [(ngModel)]="newText"
       placeholder="Twój komentarz"
@@ -25,6 +19,24 @@
       cols="40"
     ></textarea>
     <br />
-    <button (click)="addComment()" [disabled]="!newText.trim()">Wyślij</button>
+    <button class="sendButton" (click)="addComment()" [disabled]="!newText.trim()">Wyślij</button>
   </div>
+  <h3>Komentarze:</h3>
+
+  <ul *ngIf="comments.length > 0; else brakKomentarzy">
+    <li *ngFor="let comment of comments" class="comment">
+      <strong>{{ comment.author_name || 'Użytkownik #' + comment.user_id }}</strong><br>
+      <span>
+      {{ comment.content }}
+      </span>
+      <br />
+      <small class="time">{{ comment.created_at | date: 'short' }}</small>
+    </li>
+  </ul>
+
+  <ng-template #brakKomentarzy>
+    <p>Brak komentarzy.</p>
+  </ng-template>
+
+
 </div>
