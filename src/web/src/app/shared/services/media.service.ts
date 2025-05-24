@@ -77,4 +77,14 @@ export class MediaServiceService {
       this.http.post(`${environment.apiUrl}/media/upload`, formData)
     );
   }
+
+  async getMyPhotos(): Promise<Media[]> {
+  const currentUser = await this.userService.getCurrentUser();
+  console.log('Current User ID:', currentUser!.id);
+  return firstValueFrom(
+    this.http.get<Media[]>(`${environment.apiUrl}/search/my-photos`, {
+      params: { user_id: currentUser!.id }
+    })
+  );
+}
 }

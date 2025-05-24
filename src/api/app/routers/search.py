@@ -66,3 +66,19 @@ async def search(request: MediaSearchRequest, client=Depends(get_elasticsearch))
         media.append(document)
 
     return media
+
+
+@router.get("/my-photos")
+def get_my_photos(
+    user_id: str,
+    es=Depends(get_elasticsearch)
+):
+    query = {
+        "query": {
+            "term": {
+                "user_id": user_id
+            }
+        }
+    }
+    result = es.search(index="media_index", body=query)
+    return [hit["_source"] for hit in result["hits"]["hits"]]
