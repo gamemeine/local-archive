@@ -8,7 +8,10 @@ import { MarkerService } from '../../services/marker.service';
 import { CustomMarker } from '../../interfaces/marker';
 import { PhotoServiceService } from '../../services/photo-service.service';
 import { MockMarkers } from '../../mocks/mockMarkers';
-
+import { MediaServiceService } from '../../services/media.service';
+import { Media } from '../../interfaces/media';
+import { DataInstance } from '../../interfaces/dataInstance';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -20,7 +23,8 @@ export class MapComponent implements OnInit {
   constructor(
     private dialog: Dialog,
     private mapService: MarkerService,
-    private photoService: PhotoServiceService
+    private photoService: PhotoServiceService,
+    private mediaService: MediaServiceService
   ) {}
 
   map!: mapboxgl.Map;
@@ -28,8 +32,11 @@ export class MapComponent implements OnInit {
   lat = 52.23017;
   lng = 20.985742;
   clickedMarker: mapboxgl.Marker | null = null;
+  markers: Media[] = [];
+  media: Media[] = [];
+  photos: DataInstance[] = [];
 
-  markers: CustomMarker[] = MockMarkers;
+  private subscriptions = new Subscription();
 
   ngOnInit(): void {
     this.map = new mapboxgl.Map({
@@ -41,24 +48,42 @@ export class MapComponent implements OnInit {
     });
 
     this.map.getCanvas().style.cursor = 'crosshair';
+    this.subscriptions.add(
+      this.mediaService.search().subscribe((result) => {
+        this.media = result;
+        console.log('Media:', this.media);
+        this.map.on('load', () => {
+          this.addMarkersToMap();
+          this.emitSearchBasedOnBounds();
 
-    this.map.on('load', () => {
-      this.addMarkersToMap();
+          // Re-run search when map is moved or zoomed
+          this.map.on('moveend', () => {
+            this.emitSearchBasedOnBounds();
+          });
 
-      this.map.on('click', (e) => {
-        const point = e.lngLat;
-        this.handlePointSelection(point);
-      });
-    });
+          this.map.on('click', (e) => {
+            const point = e.lngLat;
+            this.handlePointSelection(point);
+          });
+        });
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe(); // Clean up
   }
 
   addMarkersToMap() {
-    this.markers.forEach((marker) => {
+    this.media.forEach((media) => {
       new mapboxgl.Marker()
-        .setLngLat([marker.lng, marker.lat])
+        .setLngLat([
+          media.location.coordinates.lon,
+          media.location.coordinates.lat,
+        ])
         .setPopup(
           new mapboxgl.Popup().setHTML(
-            `<h4>${marker.title}</h4><p>${marker.date}</p>`
+            `<h4>${media.content}</h4><p>${media.content}</p>`
           )
         )
         .addTo(this.map);
@@ -122,20 +147,24 @@ export class MapComponent implements OnInit {
 
   findNearbyMarkers(center: [number, number]) {
     const nearbyMarkers = this.markers.filter((marker) => {
-      const distance = turf.distance(center, [marker.lng, marker.lat], {
-        units: 'kilometers',
-      });
+      const distance = turf.distance(
+        center,
+        [marker.location.coordinates.lon, marker.location.coordinates.lat],
+        {
+          units: 'kilometers',
+        }
+      );
       return distance <= this.mapService.radius / 1000;
     });
 
     this.displayMarkerInfo(nearbyMarkers);
   }
 
-  displayMarkerInfo(markers: CustomMarker[]) {
+  displayMarkerInfo(markers: Media[]) {
     let markerIds: string[] = [];
     markers.forEach((marker) => {
-      console.log(marker.title, marker.date);
-      markerIds.push(marker.id);
+      console.log(marker.title, marker.created_at);
+      markerIds.push(marker.id.toString());
       //   new mapboxgl.Popup()
       //     .setLngLat([marker.lng, marker.lat])
       //     .setHTML(`<strong>${marker.title}</strong><p>${marker.date}</p>`)
@@ -143,5 +172,34 @@ export class MapComponent implements OnInit {
       // });
     });
     this.photoService.getPhotosByIds(markerIds);
+  }
+
+  emitSearchBasedOnBounds() {
+    const bounds = this.map?.getBounds();
+    if (!bounds) {
+      console.warn('Map bounds are not available yet.');
+      return;
+    }
+    const upperLeft = bounds.getNorthWest(); // Top-left
+    const bottomRight = bounds.getSouthEast(); // Bottom-right
+
+    console.log('Bounds:', {
+      upperLeft: { lat: upperLeft.lat, lon: upperLeft.lng },
+      bottomRight: { lat: bottomRight.lat, lon: bottomRight.lng },
+    });
+
+    // Assuming your service supports bounding box search
+    this.subscriptions.add(
+      this.mediaService
+        .search(
+          { lon: upperLeft.lng, lat: upperLeft.lat },
+          { lon: bottomRight.lng, lat: bottomRight.lat }
+        )
+        .subscribe((result: any) => {
+          this.media = result;
+          console.log('Search result:', this.media);
+          this.addMarkersToMap();
+        })
+    );
   }
 }

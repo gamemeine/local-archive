@@ -30,8 +30,8 @@ export class ContentDisplayComponent {
   ngOnInit(): void {
     // Subscribe to media
     this.subscriptions.add(
-      this.mediaService.search().subscribe((result) => {
-        this.media = result;
+      this.mediaService.currentMedia$.subscribe((media) => {
+        this.media = media;
       })
     );
 
