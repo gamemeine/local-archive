@@ -1,0 +1,19 @@
+<div class="my-photo-card">
+  <div class="my-photo-image">
+    <img [src]="getImageUrl()" alt="{{ data.title }}" />
+  </div>
+  <div class="my-photo-info">
+    <h3>{{ data.title }}</h3>
+    <p class="description">{{ data.description }}</p>
+    <div class="privacy">
+      <span class="privacy-label">Prywatność:</span>
+      <span class="privacy-value" [ngClass]="data.privacy">{{ data.privacy }}</span>
+    </div>
+    <div class="actions">
+      <button class="delete-btn" (click)="onDelete()">🗑 Usuń</button>
+      <button class="privacy-btn" (click)="onPrivacyChange(data.privacy === 'public' ? 'private' : 'public')">
+        {{ data.privacy === 'public' ? 'Ustaw jako prywatne' : 'Ustaw jako publiczne' }}
+      </button>
+    </div>
+  </div>
+</div>

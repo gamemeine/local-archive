@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Media } from '../interfaces/media';
-import { firstValueFrom, Observable } from 'rxjs';
 import { UsersService } from './users.service';
-import { BehaviorSubject } from 'rxjs';
+import { Observable, firstValueFrom, BehaviorSubject } from 'rxjs';
+
 interface UploadMediaRequest {
   title: string;
   description: string;
@@ -85,6 +85,16 @@ export class MediaServiceService {
     this.http.get<Media[]>(`${environment.apiUrl}/search/my-photos`, {
       params: { user_id: currentUser!.id }
     })
+  );
+  }
+
+  async deletePhoto(id: string) : Promise<any>  {
+    return await firstValueFrom(this.http.delete(`${environment.apiUrl}/media/delete/${id}`));
+    }
+
+  async changePhotoPrivacy(id: string, privacy: string): Promise<any> {
+  return await firstValueFrom(
+    this.http.patch(`${environment.apiUrl}/media/privacy/${id}`, { privacy })
   );
 }
 }

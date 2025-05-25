@@ -1,10 +1,12 @@
-from fastapi import APIRouter, UploadFile, File, Depends, Form, Path
+from http.client import HTTPException
+from fastapi import APIRouter, UploadFile, File, Depends, Form, Path, Body
 from app.services.db import get_database
 from pydantic import BaseModel
 from app.services.db.models import CreationDate, Location, Media, PhotoContent
 from app.services.db.comment_out import CommentOut
 from app.services.media_service import (
     add_media,
+    change_media_privacy,
     delete_media,
     get_media,
     add_comment_to_media,
@@ -75,9 +77,11 @@ def upload(
         latitude=request.latitude,
         longitude=request.longitude
     )
-    creation_date = CreationDate(date_from=request.creation_date, date_to=request.creation_date)
+    creation_date = CreationDate(
+        date_from=request.creation_date, date_to=request.creation_date)
 
-    uploaded = add_media(db, es, medium, content, location, creation_date, request.images)
+    uploaded = add_media(db, es, medium, content, location,
+                         creation_date, request.images)
     return uploaded
 
 
@@ -92,7 +96,8 @@ def add_comment(
     request: AddCommentRequest,
     db: Session = Depends(get_database)
 ):
-    added_comment = add_comment_to_media(media_id, request.user_id, request.text, db)
+    added_comment = add_comment_to_media(
+        media_id, request.user_id, request.text, db)
     return {"New comment id": added_comment.id}
 
 
@@ -114,10 +119,23 @@ def get_comments(
     ]
 
 
-@router.delete("/{media_id}")
+@router.delete("/delete/{media_id}")
 def delete(
     media_id: str,
     db=Depends(get_database),
     es=Depends(get_elasticsearch)
 ):
     delete_media(db, es, media_id)
+
+
+@router.patch("/privacy/{media_id}")
+def change_privacy(
+    media_id: int,
+    privacy: str = Body(..., embed=True),
+    db=Depends(get_database),
+    es=Depends(get_elasticsearch)
+):
+    success = change_media_privacy(db, es, media_id, privacy)
+    if not success:
+        raise HTTPException(status_code=404, detail="Media not found")
+    return {"message": "Privacy updated"}

@@ -141,11 +141,31 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
     """
     Delete media from the database, Elasticsearch, and storage.
     """
-    # Delete from database
+    # Get the media object
     medium = db.query(Media).filter(Media.id == media_id).first()
     if not medium:
         return False
 
+    # 1. Find all PredefinedMetadata IDs for this media
+    metadata_ids = [
+        m.id for m in db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id == media_id)
+    ]
+
+    if metadata_ids:
+        # 2. Delete all PhotoContent referencing these metadata IDs
+        db.query(PhotoContent).filter(PhotoContent.metadata_id.in_(metadata_ids)).delete(synchronize_session=False)
+        # 3. Delete all CreationDate referencing these metadata IDs
+        db.query(CreationDate).filter(CreationDate.metadata_id.in_(metadata_ids)).delete(synchronize_session=False)
+        # 4. Delete all Location referencing these metadata IDs (if you have this table)
+        db.query(Location).filter(Location.metadata_id.in_(metadata_ids)).delete(synchronize_session=False)
+
+    # 5. Delete all PredefinedMetadata for this media
+    db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id == media_id).delete(synchronize_session=False)
+
+    # 6. Delete all Photo for this media
+    db.query(Photo).filter(Photo.media_id == media_id).delete(synchronize_session=False)
+
+    # 7. Delete the Media itself
     db.delete(medium)
     db.commit()
 
@@ -153,8 +173,9 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
     es.delete(index=settings.elasticsearch_index, id=media_id)
 
     # Delete files from storage
-    for photo in medium.photos:
+    for photo in getattr(medium, "photos", []):
         delete_file(photo.file_url)
+
     return True
 
 
@@ -170,3 +191,20 @@ def delete_image(filename: str) -> bool:
     filepath = os.path.join(settings.upload_dir, filename)
     res = delete_file(filepath)
     return res
+
+
+def change_media_privacy(db: Session, es: Elasticsearch, media_id: int, privacy: str) -> bool:
+    medium = db.query(Media).filter(Media.id == media_id).first()
+    if not medium:
+        return False
+    medium.privacy = privacy
+    db.commit()
+    try:
+        es.update(
+            index=settings.elasticsearch_index,
+            id=media_id,
+            body={"doc": {"privacy": privacy}}
+        )
+    except Exception:
+        pass
+    return True
