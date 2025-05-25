@@ -17,7 +17,7 @@ export class MyPhotoEntryComponent {
 
   getImageUrl(): string {
     return (
-      this.data.photos?.[0]?.thumbnail_url
+      this.data?.photos?.[0]?.thumbnail_url
         ? environment.apiUrl + this.data.photos[0].thumbnail_url
         : ''
     );
