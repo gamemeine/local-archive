@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session, joinedload
 from elasticsearch import Elasticsearch
 from app.config import settings
-from app.services.db.models import (Media, Photo, PhotoContent,
+from app.services.db.models import (Comment, CommentPhoto, Media, Photo, PhotoContent,
                                     PredefinedMetadata, Location, CreationDate)
 from app.repository.media_repository import (save_file, delete_file,
                                              save_new_comment_in_db,
@@ -141,31 +141,35 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
     """
     Delete media from the database, Elasticsearch, and storage.
     """
-    # Get the media object
     medium = db.query(Media).filter(Media.id == media_id).first()
     if not medium:
         return False
 
-    # 1. Find all PredefinedMetadata IDs for this media
+    # First, get comment IDs that will be deleted
+    comment_ids = [
+        c.id for c in db.query(Comment).filter(Comment.media_id == media_id)
+    ]
+
+    # Delete related comment_photo entries first
+    if comment_ids:
+        db.query(CommentPhoto).filter(CommentPhoto.comment_id.in_(comment_ids)).delete(synchronize_session=False)
+
+    # Delete the comments now that nothing references them
+    db.query(Comment).filter(Comment.id.in_(comment_ids)).delete(synchronize_session=False)
+
     metadata_ids = [
         m.id for m in db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id == media_id)
     ]
+    photo_ids = [
+        p.id for p in db.query(Photo).filter(Photo.media_id == media_id)
+    ]
 
     if metadata_ids:
-        # 2. Delete all PhotoContent referencing these metadata IDs
-        db.query(PhotoContent).filter(PhotoContent.metadata_id.in_(metadata_ids)).delete(synchronize_session=False)
-        # 3. Delete all CreationDate referencing these metadata IDs
-        db.query(CreationDate).filter(CreationDate.metadata_id.in_(metadata_ids)).delete(synchronize_session=False)
-        # 4. Delete all Location referencing these metadata IDs (if you have this table)
-        db.query(Location).filter(Location.metadata_id.in_(metadata_ids)).delete(synchronize_session=False)
+        for model in [PhotoContent, CreationDate, Location]:
+            db.query(model).filter(model.metadata_id.in_(metadata_ids)).delete(synchronize_session=False)
 
-    # 5. Delete all PredefinedMetadata for this media
     db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id == media_id).delete(synchronize_session=False)
-
-    # 6. Delete all Photo for this media
     db.query(Photo).filter(Photo.media_id == media_id).delete(synchronize_session=False)
-
-    # 7. Delete the Media itself
     db.delete(medium)
     db.commit()
 
