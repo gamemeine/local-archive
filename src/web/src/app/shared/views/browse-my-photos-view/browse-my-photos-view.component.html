@@ -1,0 +1,8 @@
+<div class="photos">
+  <app-my-photo-entry
+    *ngFor="let item of myPhotos"
+    [data]="item"
+    (deleted)="onDeletePhoto($event)"
+    (privacyChanged)="onPrivacyChanged($event)">
+  </app-my-photo-entry>
+</div>
