@@ -160,9 +160,6 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
     metadata_ids = [
         m.id for m in db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id == media_id)
     ]
-    photo_ids = [
-        p.id for p in db.query(Photo).filter(Photo.media_id == media_id)
-    ]
 
     if metadata_ids:
         for model in [PhotoContent, CreationDate, Location]:
