@@ -4,7 +4,7 @@ from datetime import datetime
 
 class CommentOut(BaseModel):
     id: int
-    user_id: int
+    user_id: str
     content: str
     created_at: datetime
     author_name: str
