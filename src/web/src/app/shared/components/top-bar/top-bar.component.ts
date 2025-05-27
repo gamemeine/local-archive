@@ -14,8 +14,6 @@ export class TopBarComponent {
   navEntries = [
     { name: 'Przeglądaj', route: '/home' },
     { name: 'Moje zdjęcia', route: './photos' },
-    { name: 'Kontakt', route: 'contact' },
-    { name: 'Ustawienia', route: 'settings' }
   ];
 
 }
