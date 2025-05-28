@@ -15,8 +15,6 @@ import { AuthService } from '@auth0/auth0-angular';
 })
 export class LoginFormComponent {
 
-  username : string = '';
-  password : string = '';
   constructor(public auth: AuthService, private router: Router) {}
 
   login(): void {
