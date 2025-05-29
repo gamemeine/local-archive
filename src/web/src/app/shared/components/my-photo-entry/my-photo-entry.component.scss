@@ -1,92 +1,99 @@
 .my-photo-card {
   display: flex;
-  align-items: flex-start;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  margin: 1rem 0;
-  overflow: hidden;
-  transition: box-shadow 0.2s;
-
-  &:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-  }
+  flex-direction: row;
+  border-radius: 20px;
+  width: 90%;
+  margin: 20px 0px;
+  box-shadow: 0 0px 5px rgba(255, 255, 255, 0.15);
+  border: 2px solid gray;
+  height: 200px;
 }
 
-.my-photo-image img {
-  width: 140px;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 12px 0 0 12px;
+.my-photo-card img {
+  width: auto;
+  height: 150px;
+  margin: 15px;
+  border: 3px solid white;
+  border-radius: 10px;
+}
+
+.my-photo-image {
+  width: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.actions,
+.my-photo-info {
+  width: 35%;
+  display: flex;
+  align-items: center;
 }
 
 .my-photo-info {
-  flex: 1;
-  padding: 1rem;
-  display: flex;
   flex-direction: column;
-}
-
-.my-photo-info h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
-}
-
-.my-photo-info .description {
-  color: #555;
-  margin-bottom: 0.5rem;
-}
-
-.privacy {
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
-}
-
-.privacy-label {
-  font-weight: 500;
-}
-
-.privacy-value.public {
-  color: #2196f3;
-  font-weight: bold;
-}
-
-.privacy-value.private {
-  color: #e91e63;
-  font-weight: bold;
+  justify-content: center;
+  color: white;
 }
 
 .actions {
-  display: flex;
-  gap: 0.5rem;
+  justify-content: space-evenly;
+  flex-direction: column;
+  align-items: center;
+
+  button {
+    padding: 10px 30px;
+    border: 2px solid gray;
+    font-weight: bolder;
+    border-radius: 20px;
+    width: 70%;
+
+    &:hover {
+      cursor: pointer;
+      box-shadow: 0 0px 10px rgba(255, 255, 255, 0.15);
+    }
+  }
+}
+
+.privacy-value {
+  color: white;
+  font-weight: bold;
+}
+
+.public {
+  color: green;
+}
+
+.private {
+  color: rgb(179, 0, 0);
 }
 
 .delete-btn {
-  background: #e57373;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.4rem 0.8rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background 0.2s;
+  background-color: rgb(179, 0, 0);
+
+  color: white;
+
+  &:hover {
+    background-color: rgb(131, 1, 1);
+  }
 }
 
-.delete-btn:hover {
-  background: #d32f2f;
+.edit-btn {
+  background-color: rgb(3, 83, 158);
+  color: white;
+
+  &:hover {
+    background-color: rgb(1, 44, 85);
+  }
 }
 
 .privacy-btn {
-  background: #2196f3;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.4rem 0.8rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background 0.2s;
-}
+  background-color: rgb(18, 105, 25);
+  color: white;
 
-.privacy-btn:hover {
-  background: #1976d2;
+  &:hover {
+    background-color: rgb(7, 85, 14);
+
+  }
 }

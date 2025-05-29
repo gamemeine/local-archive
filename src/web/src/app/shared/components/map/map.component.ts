@@ -59,6 +59,12 @@ export class MapComponent implements OnInit {
           // Re-run search when map is moved or zoomed
           this.map.on('moveend', () => {
             this.emitSearchBasedOnBounds();
+            if (this.clickedMarker) {
+              this.clickedMarker.remove();
+              this.map.removeLayer('radius-circle-layer');
+              this.map.removeLayer('radius-circle-border');
+              this.map.removeSource('radius-circle');
+            }
           });
 
           this.map.on('click', (e) => {
@@ -108,28 +114,31 @@ export class MapComponent implements OnInit {
         data: circle,
       });
 
-      // Fill layer (light blue transparent)
-      this.map.addLayer({
-        id: 'radius-circle-layer',
-        type: 'fill',
-        source: 'radius-circle',
-        paint: {
-          'fill-color': '#00BFFF',
-          'fill-opacity': 0.3,
-        },
-      });
+      if (!this.map.getLayer('radius-circle-layer')) {
+        this.map.addLayer({
+          id: 'radius-circle-layer',
+          type: 'fill',
+          source: 'radius-circle',
+          paint: {
+            'fill-color': '#00BFFF',
+            'fill-opacity': 0.3,
+          },
+        });
+      }
 
       // Border layer (green dashed)
-      this.map.addLayer({
-        id: 'radius-circle-border',
-        type: 'line',
-        source: 'radius-circle',
-        paint: {
-          'line-color': 'green',
-          'line-width': 2,
-          'line-dasharray': [2, 2],
-        },
-      });
+      if (!this.map.getLayer('radius-circle-border')) {
+        this.map.addLayer({
+          id: 'radius-circle-border',
+          type: 'line',
+          source: 'radius-circle',
+          paint: {
+            'line-color': 'green',
+            'line-width': 2,
+            'line-dasharray': [2, 2],
+          },
+        });
+      }
     }
 
     // Remove previous marker if it exists
@@ -146,7 +155,7 @@ export class MapComponent implements OnInit {
   }
 
   findNearbyMarkers(center: [number, number]) {
-    const nearbyMarkers = this.markers.filter((marker) => {
+    const nearbyMarkers = this.media.filter((marker) => {
       const distance = turf.distance(
         center,
         [marker.location.coordinates.lon, marker.location.coordinates.lat],
@@ -163,7 +172,7 @@ export class MapComponent implements OnInit {
   displayMarkerInfo(markers: Media[]) {
     let markerIds: string[] = [];
     markers.forEach((marker) => {
-      console.log(marker.title, marker.created_at);
+      // console.log(marker.title, marker.created_at);
       markerIds.push(marker.id.toString());
       //   new mapboxgl.Popup()
       //     .setLngLat([marker.lng, marker.lat])
@@ -171,10 +180,11 @@ export class MapComponent implements OnInit {
       //     .addTo(this.map);
       // });
     });
-    this.photoService.getPhotosByIds(markerIds);
+    // console.log('Marker IDs:', markerIds);
+    this.emitSearchBasedOnBounds(markerIds);
   }
 
-  emitSearchBasedOnBounds() {
+  emitSearchBasedOnBounds(ids?: string[]) {
     const bounds = this.map?.getBounds();
     if (!bounds) {
       console.warn('Map bounds are not available yet.');
@@ -183,21 +193,22 @@ export class MapComponent implements OnInit {
     const upperLeft = bounds.getNorthWest(); // Top-left
     const bottomRight = bounds.getSouthEast(); // Bottom-right
 
-    console.log('Bounds:', {
-      upperLeft: { lat: upperLeft.lat, lon: upperLeft.lng },
-      bottomRight: { lat: bottomRight.lat, lon: bottomRight.lng },
-    });
+    // console.log('Bounds:', {
+    //   upperLeft: { lat: upperLeft.lat, lon: upperLeft.lng },
+    //   bottomRight: { lat: bottomRight.lat, lon: bottomRight.lng },
+    // });
 
     // Assuming your service supports bounding box search
     this.subscriptions.add(
       this.mediaService
         .search(
           { lon: upperLeft.lng, lat: upperLeft.lat },
-          { lon: bottomRight.lng, lat: bottomRight.lat }
+          { lon: bottomRight.lng, lat: bottomRight.lat },
+          ids ? ids : null
         )
         .subscribe((result: any) => {
-          this.media = result;
-          console.log('Search result:', this.media);
+          // this.media = result;
+          // console.log('Search result:', this.media);
           this.addMarkersToMap();
         })
     );
