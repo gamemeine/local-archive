@@ -34,7 +34,8 @@ export class MediaServiceService {
     br_tuple: any = {
       lon: 90,
       lat: 0,
-    }
+    },
+    ids?: string[] | null
   ): Observable<Media[]> {
     let body = {
       location: {
@@ -55,7 +56,16 @@ export class MediaServiceService {
       body
     );
 
-    request.subscribe((media) => this.currentMediaSubject.next(media));
+    if (ids) {
+      request.subscribe((media) =>
+        this.currentMediaSubject.next(
+          media.filter((m: Media) => ids.includes(m.id.toString()))
+        )
+      );
+    } else {
+      request.subscribe((media) => this.currentMediaSubject.next(media));
+    }
+
     return request;
   }
 
@@ -79,22 +89,31 @@ export class MediaServiceService {
   }
 
   async getMyPhotos(): Promise<Media[]> {
-  const currentUser = await this.userService.getCurrentUser();
-  console.log('Current User ID:', currentUser!.id);
-  return firstValueFrom(
-    this.http.get<Media[]>(`${environment.apiUrl}/search/my-photos`, {
-      params: { user_id: currentUser!.id }
-    })
-  );
+    const currentUser = await this.userService.getCurrentUser();
+    console.log('Current User ID:', currentUser!.id);
+    return firstValueFrom(
+      this.http.get<Media[]>(`${environment.apiUrl}/search/my-photos`, {
+        params: { user_id: currentUser!.id },
+      })
+    );
   }
 
-  async deletePhoto(id: string) : Promise<any>  {
-    return await firstValueFrom(this.http.delete(`${environment.apiUrl}/media/delete/${id}`));
-    }
+  async deletePhoto(id: string): Promise<any> {
+    return await firstValueFrom(
+      this.http.delete(`${environment.apiUrl}/media/delete/${id}`)
+    );
+  }
 
   async changePhotoPrivacy(id: string, privacy: string): Promise<any> {
-  return await firstValueFrom(
-    this.http.patch(`${environment.apiUrl}/media/privacy/${id}`, { privacy })
-  );
-}
+    return await firstValueFrom(
+      this.http.patch(`${environment.apiUrl}/media/privacy/${id}`, { privacy })
+    );
+  }
+
+  filterMediaByIds(ids: string[]): void {
+    const filtered = this.currentMediaSubject.value.filter((media: Media) =>
+      ids.includes(media.id.toString())
+    );
+    this.currentMediaSubject.next(filtered);
+  }
 }

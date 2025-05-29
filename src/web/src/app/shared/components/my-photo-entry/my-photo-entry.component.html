@@ -6,14 +6,25 @@
     <h3>{{ data.title }}</h3>
     <p class="description">{{ data.description }}</p>
     <div class="privacy">
-      <span class="privacy-label">Prywatność:</span>
-      <span class="privacy-value" [ngClass]="data.privacy">{{ data.privacy }}</span>
+      <span class="privacy-label">Prywatność: </span>
+      <span class="privacy-value" [ngClass]="data.privacy">
+        <ng-container *ngIf="data.privacy == 'public'; else elseTemplate">
+          Publiczne
+        </ng-container>
+        <ng-template #elseTemplate>
+          Prywatne
+        </ng-template>
+      </span>
     </div>
+  </div>
+
     <div class="actions">
-      <button class="delete-btn" (click)="onDelete()">🗑 Usuń</button>
       <button class="privacy-btn" (click)="onPrivacyChange(data.privacy === 'public' ? 'private' : 'public')">
         {{ data.privacy === 'public' ? 'Ustaw jako prywatne' : 'Ustaw jako publiczne' }}
       </button>
+
+      <button class="edit-btn" (click)="onDelete()">Edytuj</button>
+      <button class="delete-btn" (click)="onDelete()">🗑 Usuń</button>
+
     </div>
-  </div>
 </div>
