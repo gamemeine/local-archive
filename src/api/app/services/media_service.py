@@ -260,3 +260,15 @@ def get_media_access_request(db: Session, media_id: int) -> List[AccessRequest]:
         .order_by(AccessRequest.created_at.desc())
         .all()
     )
+
+
+def change_access_request_status(db: Session, request_id: int, new_status: str) -> bool:
+    access_request = db.query(AccessRequest).filter_by(id=request_id).first()
+    if not access_request:
+        return False
+
+    access_request.status = new_status
+    access_request.updated_at = datetime.utcnow()
+
+    db.commit()
+    return True

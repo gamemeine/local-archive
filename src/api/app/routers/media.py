@@ -14,7 +14,8 @@ from app.services.media_service import (
     add_comment_to_media,
     get_media_comments,
     send_media_access_request,
-    get_media_access_request
+    get_media_access_request,
+    change_access_request_status
 )
 from app.services.es import get_elasticsearch
 from sqlalchemy.orm import Session
@@ -168,3 +169,18 @@ def get_all_access_requests_for_media(
     if not requests:
         raise HTTPException(status_code=404, detail="Access request fetch failed.")
     return requests
+
+class AccessRequestUpdate(BaseModel):
+    status: str
+
+@router.patch("/access-request/{request_id}")
+def update_access_request_status(
+    request_id: int = Path(...),
+    update: AccessRequestUpdate = Body(...),
+    db: Session = Depends(get_database)
+):
+    success = change_access_request_status(db, request_id, update.status)
+    if not success:
+        raise HTTPException(status_code=404, detail="Access request not found.")
+
+    return {"message": f"Access request {update.status}."}
