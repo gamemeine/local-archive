@@ -155,6 +155,8 @@ def send_access_request(
     db=Depends(get_database),
     es=Depends(get_elasticsearch)
 ):
+    print("ODEBRANE ŻĄDANIE:", request)
+    print("user_id:", request.user_id)
     success = send_media_access_request(db, es, media_id, request.user_id)
     if not success:
         raise HTTPException(status_code=404, detail="Access request send failed.")
