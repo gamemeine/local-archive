@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 from elasticsearch import Elasticsearch
 from app.config import settings
 from app.services.db.models import (Comment, CommentPhoto, Media, Photo, PhotoContent,
-                                    PredefinedMetadata, Location, CreationDate)
+                                    PredefinedMetadata, Location, CreationDate, AccessRequest)
 from app.repository.media_repository import (save_file, delete_file,
                                              save_new_comment_in_db,
                                              get_media_comments_from_db)
@@ -18,7 +18,9 @@ from app.services.es.models import (
     CreationDate as ElasticCreationDate,
     YearRange
 )
-
+from sqlalchemy.exc import IntegrityError
+from datetime import datetime
+from typing import List
 
 class ImageDescriptor(BaseModel):
     id: str
@@ -209,3 +211,52 @@ def change_media_privacy(db: Session, es: Elasticsearch, media_id: int, privacy:
     except Exception:
         pass
     return True
+
+def send_media_access_request(db: Session, es: Elasticsearch, media_id: int, user_id: str) -> bool:
+    existing_request = db.query(AccessRequest).filter_by(
+        media_id=media_id,
+        requester_id=user_id,
+        status='pending'
+    ).first()
+
+    if existing_request:
+        return False
+
+    new_request = AccessRequest(
+        media_id=media_id,
+        requester_id=user_id,
+        status='pending',
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+
+    try:
+        db.add(new_request)
+        db.commit()
+        db.refresh(new_request)
+
+        es.index(
+            index="access_requests",
+            id=new_request.id,
+            document={
+                "id": new_request.id,
+                "media_id": media_id,
+                "requester_id": user_id,
+                "status": "pending",
+                "created_at": new_request.created_at.isoformat(),
+                "updated_at": new_request.updated_at.isoformat()
+            }
+        )
+
+        return True
+    except IntegrityError:
+        db.rollback()
+        return False
+
+def get_media_access_request(db: Session, media_id: int) -> List[AccessRequest]:
+    return (
+        db.query(AccessRequest)
+        .filter(AccessRequest.media_id == media_id)
+        .order_by(AccessRequest.created_at.desc())
+        .all()
+    )
