@@ -144,7 +144,7 @@ export class MapComponent implements OnInit {
       .addTo(this.map);
 
     // use service to filter current media by circle
-    this.mediaService.filterMediaByCircle(center, this.mapService.radius);
+    this.mediaService.filterByRadious(center, this.mapService.radius);
   }
 
   emitSearchBasedOnBounds() {
@@ -158,7 +158,7 @@ export class MapComponent implements OnInit {
 
     this.subscriptions.add(
       this.mediaService
-        .search(
+        .searchBounds(
           { lon: upperLeft.lng, lat: upperLeft.lat },
           { lon: bottomRight.lng, lat: bottomRight.lat }
         ) // service.search triggers currentMedia update which redraws markers

@@ -4,6 +4,7 @@ import { FiltersPopupComponent } from '../filters-popup/filters-popup.component'
 import { MapPopupComponent } from '../map-popup/map-popup.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MediaServiceService } from '../../services/media.service';
 
 @Component({
   selector: 'app-searchbar',
@@ -13,7 +14,10 @@ import { CommonModule } from '@angular/common';
   styleUrl: './searchbar.component.scss',
 })
 export class SearchbarComponent {
-  constructor(private dialog: Dialog) {}
+  constructor(
+    private dialog: Dialog,
+    private mediaService: MediaServiceService
+  ) {}
 
   searchString = '';
 
@@ -23,8 +27,8 @@ export class SearchbarComponent {
   faultyFilters = false;
 
   allowedKeys: { [key: string]: string } = {
-    od: 'from',
-    do: 'to',
+    od: 'from_year',
+    do: 'to_year',
     od_roku: 'from_year',
     do_roku: 'to_year',
     miasto: 'city',
@@ -69,7 +73,6 @@ export class SearchbarComponent {
   }
 
   search() {
-    console.log('Filters dict:', this.filters);
-    console.log('Keywords:', this.keywords);
+    this.mediaService.searchFilters(this.keywords, this.filters);
   }
 }
