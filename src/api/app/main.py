@@ -5,6 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
+from sqlalchemy_utils import database_exists, create_database
+
+from .other import with_retry
 
 from .routers import search, media, access_request, users
 from .services.db import get_engine, Base
@@ -13,14 +16,19 @@ from .services.es import get_elasticsearch
 from app.config import get_settings
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+@with_retry(retries=5, delay=10)
+def setup():
     settings = get_settings()
-    # Create dir for storing images on server
+
+    # create uploads dir & mount static…
     os.makedirs(settings.upload_dir, exist_ok=True)
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
     # setup database
     engine = get_engine(settings)
+    if not database_exists(engine.url):
+        create_database(engine.url)
+        print(f"Created database {engine.url}")
     Base.metadata.create_all(bind=engine)
     print("Database tables created or already exist.")
 
@@ -39,8 +47,14 @@ async def lifespan(app: FastAPI):
             }
         }
     }
-    client.indices.create(index="media_index", body=mapping)
+    client.indices.create(index="media_index", body=mapping,
+                          ignore=400)  # type: ignore
     print("Elasticsearch index created or already exists.")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    setup()
 
     yield
 

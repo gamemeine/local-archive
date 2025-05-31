@@ -14,4 +14,4 @@ lint:
 
 test:
 	@echo "Running tests..."
-	pytest
+	pytest --cov=app

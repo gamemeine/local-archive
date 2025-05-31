@@ -90,3 +90,4 @@ terraform.rc
 src/web/.angular/cache/
 
 .coverage
+coverage/
