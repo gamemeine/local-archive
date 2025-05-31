@@ -4,6 +4,8 @@ import { environment } from '../../../environments/environment';
 import { Media } from '../interfaces/media';
 import { UsersService } from './users.service';
 import { Observable, firstValueFrom, BehaviorSubject } from 'rxjs';
+import { AccessRequest } from '../interfaces/accessRequest';
+import { catchError, of } from 'rxjs';
 
 interface UploadMediaRequest {
   title: string;
@@ -116,4 +118,15 @@ export class MediaServiceService {
     );
     this.currentMediaSubject.next(filtered);
   }
+
+
+  getMediaAccessRequests(id: number): Observable<AccessRequest[]> {
+    return this.http.get<AccessRequest[]>(`${environment.apiUrl}/media/access-request/${id}`).pipe(
+      catchError(error => {
+        console.error('Błąd pobierania access requests', error);
+        return of([]);
+      })
+    );
+}
+
 }

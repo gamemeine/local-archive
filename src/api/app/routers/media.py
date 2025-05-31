@@ -169,7 +169,7 @@ def get_all_access_requests_for_media(
 ):
     requests = get_media_access_request(db, media_id)
     if not requests:
-        raise HTTPException(status_code=404, detail="Access request fetch failed.")
+        return []
     return requests
 
 class AccessRequestUpdate(BaseModel):
