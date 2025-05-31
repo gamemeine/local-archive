@@ -34,6 +34,9 @@ The project is organized into several directories, each serving a specific purpo
 └── README.md
 ```
 
+## Class Diagram
+![PlantUMLClassDiagram](docs/static/class_uml.png)
+
 ## Setup
 
 1. Clone the repository:
