@@ -2,12 +2,7 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import * as mapboxgl from 'mapbox-gl';
 import * as turf from '@turf/turf';
-import { Dialog } from '@angular/cdk/dialog';
-import { FiltersPopupComponent } from '../filters-popup/filters-popup.component';
 import { MarkerService } from '../../services/marker.service';
-import { CustomMarker } from '../../interfaces/marker';
-import { PhotoServiceService } from '../../services/photo-service.service';
-import { MockMarkers } from '../../mocks/mockMarkers';
 import { MediaServiceService } from '../../services/media.service';
 import { Media } from '../../interfaces/media';
 import { DataInstance } from '../../interfaces/dataInstance';
@@ -21,9 +16,7 @@ import { Subscription } from 'rxjs';
 })
 export class MapComponent implements OnInit {
   constructor(
-    private dialog: Dialog,
     private mapService: MarkerService,
-    private photoService: PhotoServiceService,
     private mediaService: MediaServiceService
   ) {}
 
@@ -40,6 +33,8 @@ export class MapComponent implements OnInit {
 
   // hold mapbox Marker instances for easy cleanup
   private mapMarkers: mapboxgl.Marker[] = [];
+
+  private moveEndTimeout: any;
 
   ngOnInit(): void {
     this.map = new mapboxgl.Map({
@@ -78,7 +73,14 @@ export class MapComponent implements OnInit {
       })
     );
     // event hooks: always call search or filter; overlays remain intact
-    this.map.on('moveend', () => this.emitSearchBasedOnBounds());
+    this.map.on('moveend', () => {
+      if (this.moveEndTimeout) {
+        clearTimeout(this.moveEndTimeout);
+      }
+      this.moveEndTimeout = setTimeout(() => {
+        this.emitSearchBasedOnBounds();
+      }, 300);
+    });
     this.map.on('click', (e) => this.handlePointSelection(e.lngLat));
   }
 
