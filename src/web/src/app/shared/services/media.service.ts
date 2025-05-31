@@ -47,11 +47,7 @@ export class MediaServiceService {
       body
     );
 
-    request.subscribe((media) => {
-      // persist the fetched result, then update current display
-      this.radiousMediaSubject.next(media);
-      this.currentMediaSubject.next(media);
-    });
+    request.subscribe((media) => { this.currentMediaSubject.next(media); });
     return request;
   }
 
