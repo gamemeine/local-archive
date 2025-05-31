@@ -28,6 +28,8 @@ export class MediaServiceService {
   private radiousMediaSubject = new BehaviorSubject<Media[]>([]);
   public radiousMedia$ = this.radiousMediaSubject.asObservable();
 
+  public filterAplied = false;
+
   search(
     tl_tuple: any = { lon: 0, lat: 90 },
     br_tuple: any = { lon: 90, lat: 0 }
@@ -47,7 +49,12 @@ export class MediaServiceService {
       body
     );
 
-    request.subscribe((media) => { this.currentMediaSubject.next(media); });
+    request.subscribe((media) => { 
+      this.currentMediaSubject.next(media); 
+      if (!this.filterAplied) {
+        this.radiousMediaSubject.next(media);
+      }
+    });
     return request;
   }
 
@@ -64,6 +71,8 @@ export class MediaServiceService {
       return distanceKm * 1000 <= radiusMeters;
     });
     this.radiousMediaSubject.next(filtered);
+
+    this.filterAplied = true;
   }
 
   private getDistanceInKm(a: [number, number], b: [number, number]): number {

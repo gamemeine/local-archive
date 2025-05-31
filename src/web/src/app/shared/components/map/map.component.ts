@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import * as mapboxgl from 'mapbox-gl';
 import * as turf from '@turf/turf';
@@ -162,5 +162,12 @@ export class MapComponent implements OnInit {
         ) // service.search triggers currentMedia update which redraws markers
         .subscribe()
     );
+  }
+
+  @HostListener('window:resize')
+  onWindowResize() {
+    if (this.map) {
+      this.map.resize();
+    }
   }
 }
