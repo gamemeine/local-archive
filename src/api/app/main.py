@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
@@ -11,25 +12,9 @@ from .services.es import get_elasticsearch
 
 from app.config import get_settings
 
-app = FastAPI()
 
-
-app.include_router(media.router)
-app.include_router(access_request.router)
-app.include_router(search.router)
-app.include_router(users.router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     settings = get_settings()
     # Create dir for storing images on server
     os.makedirs(settings.upload_dir, exist_ok=True)
@@ -54,8 +39,26 @@ def on_startup():
             }
         }
     }
-    client.indices.create(index="media_index", body=mapping, ignore=400)
+    client.indices.create(index="media_index", body=mapping)
     print("Elasticsearch index created or already exists.")
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+app.include_router(media.router)
+app.include_router(access_request.router)
+app.include_router(search.router)
+app.include_router(users.router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")

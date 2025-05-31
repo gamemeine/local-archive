@@ -22,6 +22,7 @@ def get_database(settings=Depends(get_settings)):
     if url is None:
         raise ValueError("DATABASE_URL environment variable is not set.")
 
+    db = None
     try:
         print(f"Connecting to database at {url}")
         engine = create_engine(url)
@@ -31,4 +32,5 @@ def get_database(settings=Depends(get_settings)):
     except Exception as e:
         raise RuntimeError(f"Failed to connect to the database: {e}")
     finally:
-        db.close()
+        if db is not None:
+            db.close()

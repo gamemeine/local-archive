@@ -1,5 +1,4 @@
-from http.client import HTTPException
-from fastapi import APIRouter, UploadFile, File, Depends, Form, Path, Body
+from fastapi import HTTPException, APIRouter, UploadFile, File, Depends, Form, Path, Body
 from app.services.db import get_database
 from pydantic import BaseModel
 from app.services.db.models import CreationDate, Location, Media, PhotoContent
@@ -24,7 +23,7 @@ router = APIRouter(
 
 @router.get("/{media_id}")
 def find(
-    media_id: str,
+    media_id: int,
     db=Depends(get_database)
 ):
     """
@@ -86,7 +85,7 @@ def upload(
 
 
 class AddCommentRequest(BaseModel):
-    user_id: str
+    user_id: int
     text: str
 
 
@@ -121,7 +120,7 @@ def get_comments(
 
 @router.delete("/delete/{media_id}")
 def delete(
-    media_id: str,
+    media_id: int,
     db=Depends(get_database),
     es=Depends(get_elasticsearch)
 ):
