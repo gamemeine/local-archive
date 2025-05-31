@@ -2,7 +2,7 @@ import shutil
 import os
 from app.services.db.models import Media, Photo, Comment, CommentPhoto
 from fastapi import UploadFile
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def save_file(file: UploadFile, destination: str):
@@ -66,7 +66,7 @@ def save_new_comment_in_db(media_id: int, user_id: int, comment_txt: str, sessio
         media_id=media_id,
         user_id=user_id,
         content=comment_txt,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
 
     session.add(new_comment)

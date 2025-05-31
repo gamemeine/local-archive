@@ -1,10 +1,8 @@
-import pytest
 from fastapi import UploadFile
 import io
 from app.repository.media_repository import save_file, delete_file
 
 
-@pytest.mark.asyncio
 def test_save_file(tmp_path):
     content = b"some fake img content"
     fake_file = UploadFile(filename="test.jpg", file=io.BytesIO(content))
@@ -19,7 +17,6 @@ def test_save_file(tmp_path):
         assert saved_content == content
 
 
-@pytest.mark.asyncio
 def test_delete_file(tmp_path):
     content = b"some fake img content"
     fake_file = UploadFile(filename="test.jpg", file=io.BytesIO(content))
