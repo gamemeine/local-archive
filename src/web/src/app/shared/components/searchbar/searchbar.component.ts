@@ -4,6 +4,7 @@ import { FiltersPopupComponent } from '../filters-popup/filters-popup.component'
 import { MapPopupComponent } from '../map-popup/map-popup.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-searchbar',
   standalone: true,
@@ -14,10 +15,12 @@ import { CommonModule } from '@angular/common';
 export class SearchbarComponent {
   constructor(private dialog: Dialog) {}
 
-  unclassifiedConditions: string[] = [];
-  faultyFilters: boolean = false;
+  searchString = '';
 
-  searchString: string = '';
+  filters: { [key: string]: string } = {};
+  keywords: string[] = [];
+
+  faultyFilters = false;
 
   allowedKeys: { [key: string]: string } = {
     od: 'from',
@@ -31,30 +34,30 @@ export class SearchbarComponent {
   };
 
   parseSearchString() {
-    this.unclassifiedConditions = [];
+    this.filters = Object.values(this.allowedKeys)
+      .reduce((acc, mapped) => ({ ...acc, [mapped]: '' }), {});
+    this.keywords = [];
     this.faultyFilters = false;
-    let conditions: string[] = this.searchString.split('|');
-    const dictionaries = conditions
-      .map((condition) => {
-        const [key, value] = condition.split(':').map((s) => s.trim());
-        if (key && value) {
-          if (this.allowedKeys[key as string]) {
-            return { [this.allowedKeys[key as string]]: value };
-          }
-          this.faultyFilters = true;
-          return { [key]: value };
-        }
-        this.unclassifiedConditions.push(condition);
-        return null;
-      })
-      .filter(Boolean);
-    // Convert array of objects to a single object
-    const parsedConditions = dictionaries.reduce((acc, curr) => {
-      return { ...acc, ...curr };
-    }, {});
-    console.log('Parsed conditions:', parsedConditions);
-    // console.log('Parsed search conditions:', dictionaries);
-    console.log('Unclassified conditions:', this.unclassifiedConditions);
+
+    const text = this.searchString;
+    const kvPattern = /([^:\s|]+)\s*:\s*([^|\s]+)/g;
+    let m: RegExpExecArray | null;
+
+    while ((m = kvPattern.exec(text)) !== null) {
+      const rawKey = m[1];
+      const value  = m[2];
+      if (this.allowedKeys[rawKey]) {
+        const mapped = this.allowedKeys[rawKey];
+        this.filters[mapped] = value;
+      } else {
+        this.faultyFilters = true;
+      }
+    }
+
+    const leftover = text.replace(/([^:\s|]+)\s*:\s*([^|\s]+)/g, '').trim();
+    if (leftover) {
+      this.keywords = leftover.split(/\s+/);
+    }
   }
 
   openDialog(type: string) {
@@ -63,5 +66,10 @@ export class SearchbarComponent {
     } else if (type === 'range') {
       this.dialog.open(MapPopupComponent);
     }
+  }
+
+  search() {
+    console.log('Filters dict:', this.filters);
+    console.log('Keywords:', this.keywords);
   }
 }

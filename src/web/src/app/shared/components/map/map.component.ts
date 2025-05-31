@@ -38,6 +38,9 @@ export class MapComponent implements OnInit {
 
   private subscriptions = new Subscription();
 
+  // hold mapbox Marker instances for easy cleanup
+  private mapMarkers: mapboxgl.Marker[] = [];
+
   ngOnInit(): void {
     this.map = new mapboxgl.Map({
       accessToken: environment.mapbox.accessToken,
@@ -48,52 +51,39 @@ export class MapComponent implements OnInit {
     });
 
     this.map.getCanvas().style.cursor = 'crosshair';
+
+    // 1) kick off initial search (will populate persisted + current lists)
+    this.mediaService.search();
+    // 2) on any new currentMedia update (search or filter), redraw markers
     this.subscriptions.add(
-      this.mediaService.search().subscribe((result) => {
-        this.media = result;
-        console.log('Media:', this.media);
-        this.map.on('load', () => {
-          this.addMarkersToMap();
-          this.emitSearchBasedOnBounds();
-
-          // Re-run search when map is moved or zoomed
-          this.map.on('moveend', () => {
-            this.emitSearchBasedOnBounds();
-            if (this.clickedMarker) {
-              this.clickedMarker.remove();
-              this.map.removeLayer('radius-circle-layer');
-              this.map.removeLayer('radius-circle-border');
-              this.map.removeSource('radius-circle');
-            }
-          });
-
-          this.map.on('click', (e) => {
-            const point = e.lngLat;
-            this.handlePointSelection(point);
-          });
+      this.mediaService.currentMedia$.subscribe((mediaItems) => {
+        // remove old markers
+        this.mapMarkers.forEach((m) => m.remove());
+        this.mapMarkers = [];
+        // add new set
+        mediaItems.forEach((item) => {
+          const marker = new mapboxgl.Marker()
+            .setLngLat([
+              item.location.coordinates.lon,
+              item.location.coordinates.lat,
+            ])
+            .setPopup(
+              new mapboxgl.Popup().setHTML(
+                `<h4>${item.content}</h4><p>${item.content}</p>`
+              )
+            )
+            .addTo(this.map);
+          this.mapMarkers.push(marker);
         });
       })
     );
+    // event hooks: always call search or filter; overlays remain intact
+    this.map.on('moveend', () => this.emitSearchBasedOnBounds());
+    this.map.on('click', (e) => this.handlePointSelection(e.lngLat));
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe(); // Clean up
-  }
-
-  addMarkersToMap() {
-    this.media.forEach((media) => {
-      new mapboxgl.Marker()
-        .setLngLat([
-          media.location.coordinates.lon,
-          media.location.coordinates.lat,
-        ])
-        .setPopup(
-          new mapboxgl.Popup().setHTML(
-            `<h4>${media.content}</h4><p>${media.content}</p>`
-          )
-        )
-        .addTo(this.map);
-    });
   }
 
   handlePointSelection(point: mapboxgl.LngLat) {
@@ -151,66 +141,26 @@ export class MapComponent implements OnInit {
       .setLngLat([point.lng, point.lat])
       .addTo(this.map);
 
-    this.findNearbyMarkers(center);
+    // use service to filter current media by circle
+    this.mediaService.filterMediaByCircle(center, this.mapService.radius);
   }
 
-  findNearbyMarkers(center: [number, number]) {
-    const nearbyMarkers = this.media.filter((marker) => {
-      const distance = turf.distance(
-        center,
-        [marker.location.coordinates.lon, marker.location.coordinates.lat],
-        {
-          units: 'kilometers',
-        }
-      );
-      return distance <= this.mapService.radius / 1000;
-    });
-
-    this.displayMarkerInfo(nearbyMarkers);
-  }
-
-  displayMarkerInfo(markers: Media[]) {
-    let markerIds: string[] = [];
-    markers.forEach((marker) => {
-      // console.log(marker.title, marker.created_at);
-      markerIds.push(marker.id.toString());
-      //   new mapboxgl.Popup()
-      //     .setLngLat([marker.lng, marker.lat])
-      //     .setHTML(`<strong>${marker.title}</strong><p>${marker.date}</p>`)
-      //     .addTo(this.map);
-      // });
-    });
-    // console.log('Marker IDs:', markerIds);
-    this.emitSearchBasedOnBounds(markerIds);
-  }
-
-  emitSearchBasedOnBounds(ids?: string[]) {
+  emitSearchBasedOnBounds() {
     const bounds = this.map?.getBounds();
     if (!bounds) {
       console.warn('Map bounds are not available yet.');
       return;
     }
-    const upperLeft = bounds.getNorthWest(); // Top-left
-    const bottomRight = bounds.getSouthEast(); // Bottom-right
+    const upperLeft = bounds.getNorthWest();
+    const bottomRight = bounds.getSouthEast();
 
-    // console.log('Bounds:', {
-    //   upperLeft: { lat: upperLeft.lat, lon: upperLeft.lng },
-    //   bottomRight: { lat: bottomRight.lat, lon: bottomRight.lng },
-    // });
-
-    // Assuming your service supports bounding box search
     this.subscriptions.add(
       this.mediaService
         .search(
           { lon: upperLeft.lng, lat: upperLeft.lat },
-          { lon: bottomRight.lng, lat: bottomRight.lat },
-          ids ? ids : null
-        )
-        .subscribe((result: any) => {
-          // this.media = result;
-          // console.log('Search result:', this.media);
-          this.addMarkersToMap();
-        })
+          { lon: bottomRight.lng, lat: bottomRight.lat }
+        ) // service.search triggers currentMedia update which redraws markers
+        .subscribe()
     );
   }
 }
