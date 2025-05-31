@@ -2,27 +2,11 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, model_validator
 from app.services.es import get_elasticsearch, get_query, SearchLocation, YearRange, MediaDocument
 
+
 router = APIRouter(
     prefix="/search",
     tags=["search"],
 )
-
-# TODO: delete after media creation implementation
-
-
-@router.post("/add")
-async def add_media(media: MediaDocument, client=Depends(get_elasticsearch)):
-    document = media.model_dump_json()
-    client.index(index="media_index", id=str(media.id), body=document)
-    return {"message": "Media added successfully"}
-
-# TODO: delete after media creation implementation
-
-
-@router.post("/delete")
-async def delete_media(media_id: int, client=Depends(get_elasticsearch)):
-    client.delete(index="media_index", id=str(media_id))
-    return {"message": "Media deleted successfully"}
 
 
 class MediaSearchRequest(BaseModel):
@@ -57,8 +41,6 @@ class MediaSearchRequest(BaseModel):
 async def search(request: MediaSearchRequest, client=Depends(get_elasticsearch)):
     body = get_query(request.location, request.phrase, request.creation_date, request.page, request.size)
     result = client.search(index="media_index", body=body)
-
-    print(body)
 
     media = []
     for hit in result["hits"]["hits"]:
