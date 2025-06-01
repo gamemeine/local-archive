@@ -1,3 +1,5 @@
+// /src/web/src/app/shared/intefaces/location.ts
+
 import { Coordinates } from "./coordinates";
 
 

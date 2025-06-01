@@ -1,3 +1,5 @@
+// /src/web/src/app/shared/intefaces/dataInstance.ts
+
 export interface DataInstance {
   year: number;
   photo: string;
