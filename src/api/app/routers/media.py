@@ -1,3 +1,6 @@
+# /src/api/app/routers/media.py
+# FastAPI router for media endpoints: upload, retrieve, comment, delete, privacy.
+
 from fastapi import HTTPException, APIRouter, UploadFile, File, Depends, Form, Path, Body
 from app.services.db import get_database
 from pydantic import BaseModel
@@ -26,9 +29,7 @@ def find(
     media_id: int,
     db=Depends(get_database)
 ):
-    """
-    Get media by ID.
-    """
+    # Get media by ID
     medium = get_media(db, media_id)
     return medium
 
@@ -63,6 +64,7 @@ def upload(
     db=Depends(get_database),
     es=Depends(get_elasticsearch)
 ):
+    # Upload new media
     print(request.__dict__)
     medium = Media(
         user_id=request.user_id,
@@ -95,6 +97,7 @@ def add_comment(
     request: AddCommentRequest,
     db: Session = Depends(get_database)
 ):
+    # Add comment to media
     added_comment = add_comment_to_media(
         media_id, request.user_id, request.text, db)
     return {"New comment id": added_comment.id}
@@ -105,6 +108,7 @@ def get_comments(
     media_id: int = Path(...),
     db: Session = Depends(get_database)
 ):
+    # Get all comments for a media item
     comments = get_media_comments(media_id, db)
     return [
         CommentOut(
@@ -124,6 +128,7 @@ def delete(
     db=Depends(get_database),
     es=Depends(get_elasticsearch)
 ):
+    # Delete media by ID
     delete_media(db, es, media_id)
 
 
@@ -134,6 +139,7 @@ def change_privacy(
     db=Depends(get_database),
     es=Depends(get_elasticsearch)
 ):
+    # Change privacy of a media item
     success = change_media_privacy(db, es, media_id, privacy)
     if not success:
         raise HTTPException(status_code=404, detail="Media not found")

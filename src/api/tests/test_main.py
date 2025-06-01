@@ -1,3 +1,6 @@
+# /src/api/tests/test_main.py
+# Tests for FastAPI main app: root endpoint and validation error handler.
+
 from fastapi.testclient import TestClient
 from app.main import app
 

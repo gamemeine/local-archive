@@ -1,3 +1,6 @@
+# /src/api/tests/test_search_router.py
+# Tests for search router endpoints and ES query logic.
+
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -6,7 +9,7 @@ from app.services.es.query import get_query
 
 
 def test_location_validator_invalid_box():
-    # Arrange & Act & Assert
+    # Test SearchLocation bounding box validation
     with pytest.raises(ValueError):
         SearchLocation(
             top_left=Coordinates(lon=10, lat=0),
@@ -15,20 +18,18 @@ def test_location_validator_invalid_box():
 
 
 def test_year_range_validator():
-    # Arrange & Act & Assert
+    # Test YearRange validation
     with pytest.raises(ValueError):
         YearRange(year_from=2020, year_to=2019)
 
 
 def test_get_query_basic():
-    # Arrange
+    # Test ES query builder for paging and geo filter
     loc = SearchLocation(
         top_left=Coordinates(lon=0, lat=10),
         bottom_right=Coordinates(lon=10, lat=0),
     )
-    # Act
     q = get_query(loc, phrase=None, creation_date=None, page=2, size=5)
-    # Assert
     assert q["from"] == 10
     assert q["size"] == 5
     assert q["query"]["bool"]["filter"][0]["geo_bounding_box"]
@@ -54,6 +55,7 @@ class DummyClient:
 
 @pytest.fixture(autouse=True)
 def override_es_client():
+    # Override ES client dependency for router tests
     from app.routers.search import get_elasticsearch as get_es_dep
     app.dependency_overrides[get_es_dep] = lambda: DummyClient()
     yield
@@ -61,7 +63,7 @@ def override_es_client():
 
 
 def test_search_endpoint_returns_list():
-    # Arrange
+    # Test POST /search/ endpoint returns list of results
     client = TestClient(app)
     payload = {
         "location": {
@@ -69,9 +71,7 @@ def test_search_endpoint_returns_list():
             "bottom_right": {"lon": 10, "lat": 0},
         }
     }
-    # Act
     response = client.post("/search/", json=payload)
-    # Assert
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -79,11 +79,9 @@ def test_search_endpoint_returns_list():
 
 
 def test_my_photos_endpoint():
-    # Arrange
+    # Test GET /search/my-photos endpoint
     client = TestClient(app)
-    # Act
     response = client.get("/search/my-photos", params={"user_id": "u1"})
-    # Assert
     assert response.status_code == 200
     photos = response.json()
     assert isinstance(photos, list)

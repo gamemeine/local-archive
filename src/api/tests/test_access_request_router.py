@@ -1,3 +1,6 @@
+# /src/api/tests/test_access_request_router.py
+# Tests for AccessRequest API router using FastAPI TestClient and monkeypatching.
+
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -10,6 +13,7 @@ client = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def override_access_request_services(monkeypatch):
+    # Override dependencies and service functions for isolated router tests
     app.dependency_overrides[get_db_dep] = lambda: None
     monkeypatch.setattr(
         'app.routers.access_request.get_all_access_requests_service',

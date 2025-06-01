@@ -1,7 +1,9 @@
+# /src/api/tests/test_db_model.py
+# Test to check if all expected tables are present in the database.
+
 from testcontainers.postgres import PostgresContainer
 from app.services.db import Base
 import sqlalchemy
-
 
 def test_check_if_all_tables_are_present_in_DB():
     with PostgresContainer("postgres:13", driver=None) as postgres:

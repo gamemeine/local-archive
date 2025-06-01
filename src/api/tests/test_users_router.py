@@ -1,3 +1,6 @@
+# /src/api/tests/test_users_router.py
+# Tests for users router endpoints using FastAPI TestClient and monkeypatching.
+
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -5,6 +8,7 @@ from app.main import app
 
 @pytest.fixture(autouse=True)
 def override_users_deps(monkeypatch):
+    # Override dependencies and service functions for isolated router tests
     from app.routers.users import get_database as get_db_dep
     app.dependency_overrides[get_db_dep] = lambda: None
     monkeypatch.setattr(
@@ -22,6 +26,7 @@ def override_users_deps(monkeypatch):
 
 
 def test_ensure_user_exists_router():
+    # Test POST /users/ensure_exists endpoint
     client = TestClient(app)
     payload = {
         'id': 'u1',
@@ -30,8 +35,6 @@ def test_ensure_user_exists_router():
         'role': 'tester',
         'auth_provider': 'auth0'
     }
-    # Act
     response = client.post('/users/ensure_exists', json=payload)
-    # Assert
     assert response.status_code == 200
     assert response.json() == payload
