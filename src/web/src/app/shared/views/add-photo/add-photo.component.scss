@@ -150,3 +150,15 @@ hr {
   }
   margin: 25px;
 }
+
+.privacy-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-weight: normal;
+  font-size: 1em;
+}
+
+.privacy-checkbox input[type="checkbox"] {
+  margin-right: 0.5em;
+}
