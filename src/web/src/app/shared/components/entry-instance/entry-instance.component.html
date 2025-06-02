@@ -23,6 +23,6 @@
       <h1>To zdjęcie jest prywatne</h1>
       <button class="askButton" (click)="sendRequestAccess()">Poproś o dostęp</button>
     </div>
-    <img [src]="getImageUrl()" alt="{{ data.title || data.description }}" *ngIf="data.privacy !== 'private'"/>
+    <img [src]="getImageUrl()" alt="{{ data.title || data.description }}" *ngIf="!showPrivateBanner"/>
   </div>
 </div>

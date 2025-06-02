@@ -9,6 +9,7 @@ import { OnInit } from '@angular/core';
 import { MediaServiceService } from '../../services/media.service';
 import { map } from 'rxjs';
 import { Privacy } from '../../interfaces/media';
+import { User } from '../../services/users.service';
 
 @Component({
   selector: 'app-entry-instance',
@@ -23,13 +24,14 @@ export class EntryInstanceComponent{
   @Input() data!: Media;
 
   showPrivateBanner: boolean = true;
+  user: User | null = null;
 
   async ngOnInit(): Promise<void> {
     if (this.data.privacy === Privacy.Private) {
       const accessRequests = this.mediaService.getMediaAccessRequests(this.data.id);
-      const user = await this.usersService.getCurrentUser(); // TODO temp
+      this.user = await this.usersService.getCurrentUser();
       accessRequests.pipe(
-        map(accessRequests => accessRequests.find(accessRequest => accessRequest.requester_id.toString() === user?.id))
+        map(accessRequests => accessRequests.find(accessRequest => accessRequest.requester_id.toString() === this.user?.id))
       ).subscribe(request => {
         this.showPrivateBanner = !request || request.status === 'pending' || request.status === 'denied';
       });
@@ -54,9 +56,12 @@ export class EntryInstanceComponent{
 
 
   async sendRequestAccess(): Promise<void> {
-    const user = await this.usersService.getCurrentUser()
+    if (!this.user?.id) {
+      alert('Nie można wysłać prośby – brak użytkownika');
+      return;
+    }
     const body = {
-      user_id: user?.id
+      user_id: this.user.id
     };
     console.log("Wysyłane PATCH body:", body);
 

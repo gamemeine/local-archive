@@ -4,7 +4,7 @@ import { AuthService } from '@auth0/auth0-angular';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   display_name: string;
