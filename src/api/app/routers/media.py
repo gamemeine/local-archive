@@ -44,11 +44,11 @@ class UploadMediaRequest:
         content: str = Form(...),
         latitude: float = Form(...),
         longitude: float = Form(...),
-        city: str = Form(...),
-        country: str = Form(...),
-        postalCode: str = Form(...),
-        state: str = Form(...),
-        street: str = Form(...),
+        city: str = Form(default=None),
+        country: str = Form(default=None),
+        postalCode: str = Form(default=None),
+        state: str = Form(default=None),
+        street: str = Form(default=None),
         creation_date: str = Form(...),
     ):
         self.images = images
