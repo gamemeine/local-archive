@@ -5,13 +5,13 @@
     </div>
     <div class="data">
       <h1>{{ data.title }}</h1>
-      <p class="description">{{ data.description }}</p>
+      <p class="description">{{ data.justification }}</p>
       <p class="status">Status: {{ data.status }}</p>
 
     </div>
     <div class="controls">
-    <button >Zatwierdź</button>
-    <button >Odmów</button>
+    <button (click)="acceptRequest()">Zatwierdź</button>
+    <button (click)="rejectRequest()">Odmów</button>
 
     </div>
   </div>

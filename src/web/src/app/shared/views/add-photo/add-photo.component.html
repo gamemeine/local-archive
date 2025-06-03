@@ -26,7 +26,7 @@
   <hr>
   <span>
     <h3>Czy znasz dokładny adres?</h3>
-      <input type="radio" name="locationOption" [value]="true" class="radio" [(ngModel)]="preciseLocation"> Tak
+      <input type="radio" name="locationOption" [value]="true" class="radio" [(ngModel)]="preciseLocation" (click)="translateAddress()"> Tak
       <input type="radio" name="locationOption" [value]="false" class="radio" [(ngModel)]="preciseLocation"> Nie
   </span>
   <hr>

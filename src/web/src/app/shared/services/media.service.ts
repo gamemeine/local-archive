@@ -19,6 +19,11 @@ interface UploadMediaRequest {
   longitude: number;
   creation_date: string;
   images: File[];
+  city: string;
+  country: string;
+  postalCode: string;
+  state: string;
+  street: string;
 }
 
 @Injectable({
@@ -32,7 +37,7 @@ export class MediaServiceService {
     top_left: { lon: number; lat: number };
     bottom_right: { lon: number; lat: number };
   }>({ top_left: { lon: 0, lat: 90 }, bottom_right: { lon: 90, lat: 0 } });
-  
+
   private currentKeywordsSubject = new BehaviorSubject<string[]>([]);
   private currentFiltersSubject = new BehaviorSubject<{
     [key: string]: string;
@@ -43,6 +48,9 @@ export class MediaServiceService {
 
   private radiousMediaSubject = new BehaviorSubject<Media[]>([]);
   public radiousMedia$ = this.radiousMediaSubject.asObservable();
+
+  private searchedCoords = new BehaviorSubject<any>(null);
+  public moveToCoords$ = this.searchedCoords.asObservable();
 
   private currentRadiusSubject = new BehaviorSubject<{
     center: [number, number];
@@ -61,7 +69,10 @@ export class MediaServiceService {
   }
 
   // Update search filters and trigger search
-  searchFilters(keywords: string[], filters: { [key: string]: string }): Observable<Media[]> {
+  searchFilters(
+    keywords: string[],
+    filters: { [key: string]: string }
+  ): Observable<Media[]> {
     this.currentKeywordsSubject.next(keywords);
     this.currentFiltersSubject.next(filters);
 
@@ -74,16 +85,23 @@ export class MediaServiceService {
     const keywords = this.currentKeywordsSubject.value;
     const filters = this.currentFiltersSubject.value;
 
-    const year_from = Math.min(Number(filters['from_year']) || 1, new Date().getFullYear());
-    const year_to = Math.max(Number(filters['to_year']) || 1, new Date().getFullYear());
+    const year_from = Math.min(
+      Number(filters['from_year']) || 1,
+      new Date().getFullYear()
+    );
+    const year_to = Math.max(
+      Number(filters['to_year']) || 1,
+      new Date().getFullYear()
+    );
+    const city = filters['city'];
 
     // Build request body for backend search
     const body = {
       location: { top_left: top_left, bottom_right: bottom_right },
       phrase: keywords.join(' '),
-      creation_date: { 
-        year_from: year_from, 
-        year_to: year_to 
+      creation_date: {
+        year_from: year_from,
+        year_to: year_to,
       },
       page: 0,
       size: 10,
@@ -98,6 +116,7 @@ export class MediaServiceService {
 
     request.subscribe((media) => {
       this.currentMediaSubject.next(media);
+      console.log('Search results:', media);
       const currentRadius = this.currentRadiusSubject.value;
       if (currentRadius !== null) {
         const { center, radious } = currentRadius;
@@ -112,10 +131,7 @@ export class MediaServiceService {
   }
 
   // Filter current media by a circular radius
-  filterByRadious(
-    center: [number, number],
-    radiusMeters: number
-  ): void {
+  filterByRadious(center: [number, number], radiusMeters: number): void {
     this.currentRadiusSubject.next({ center: center, radious: radiusMeters });
     this.radiousMediaSubject.next(
       this.getMediaInCircle(
@@ -170,6 +186,11 @@ export class MediaServiceService {
     formData.append('latitude', request.latitude.toString());
     formData.append('longitude', request.longitude.toString());
     formData.append('creation_date', request.creation_date);
+    formData.append('city', request.city);
+    formData.append('country', request.country);
+    formData.append('postalCode', request.postalCode);
+    formData.append('state', request.state);
+    formData.append('street', request.street);
 
     const currentUser = await this.userService.getCurrentUser();
     formData.append('user_id', currentUser!.id);
@@ -213,13 +234,13 @@ export class MediaServiceService {
   }
 
   getMediaAccessRequests(id: number): Observable<AccessRequest[]> {
-    return this.http.get<AccessRequest[]>(`${environment.apiUrl}/media/access-request/${id}`).pipe(
-      catchError(error => {
-        console.error('Błąd pobierania access requests', error);
-        return of([]);
-      })
-    );
+    return this.http
+      .get<AccessRequest[]>(`${environment.apiUrl}/media/access-request/${id}`)
+      .pipe(
+        catchError((error) => {
+          console.error('Błąd pobierania access requests', error);
+          return of([]);
+        })
+      );
+  }
 }
-
-}
-

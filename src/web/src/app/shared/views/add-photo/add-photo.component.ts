@@ -11,13 +11,7 @@ import { MediaServiceService } from '../../services/media.service';
 @Component({
   selector: 'app-add-photo',
   standalone: true,
-  imports: [
-    CommonModule,
-    MapPickerComponent,
-    HttpClientModule,
-    FormsModule,
-    ApprovalPopupComponent,
-  ],
+  imports: [CommonModule, MapPickerComponent, HttpClientModule, FormsModule],
   templateUrl: './add-photo.component.html',
   styleUrl: './add-photo.component.scss',
 })
@@ -60,7 +54,10 @@ export class AddPhotoComponent implements OnInit {
     console.log('AddPhotoComponent initialized');
   }
 
-  parseAddress(address: string) {
+  parseAddress(address?: string): any {
+    if (!address) {
+      address = this.address;
+    }
     address = address.trim();
     let addressComponents: string[] = address.split(',');
     if (addressComponents.length < 4) {
@@ -75,6 +72,8 @@ export class AddPhotoComponent implements OnInit {
       postalCode: addressComponents[1].trim().split(' ')[0], // Assuming postal code is the first part of the city
     };
     console.log('Parsed address:', addressDict);
+    return addressDict;
+    // this.customAddress = addressDict;
   }
 
   onCoordsPicked(coords: { lat: number; lng: number }) {
@@ -86,7 +85,7 @@ export class AddPhotoComponent implements OnInit {
           res.features.length > 0
             ? res.features[0].place_name
             : 'Address not found';
-        this.parseAddress(this.address);
+        this.customAddress = this.parseAddress(this.address);
       });
   }
 
@@ -131,6 +130,7 @@ export class AddPhotoComponent implements OnInit {
       console.warn('No photo to upload.');
       return;
     }
+    this.translateAddress(); // Ensure address is translated before upload
     const images = this.imagePath;
     const title = this.title || 'No title provided';
     const description = this.description || 'No description provided';
@@ -151,6 +151,11 @@ export class AddPhotoComponent implements OnInit {
         longitude,
         creation_date: creationDate,
         images,
+        city: this.customAddress.city,
+        country: this.customAddress.country,
+        postalCode: this.customAddress.postalCode,
+        state: this.customAddress.state,
+        street: this.customAddress.street,
       });
       this.dialog.open(ApprovalPopupComponent);
       console.log('Upload result:', result);

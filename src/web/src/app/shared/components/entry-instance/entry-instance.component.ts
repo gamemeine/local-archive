@@ -16,10 +16,15 @@ import { User } from '../../services/users.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './entry-instance.component.html',
-  styleUrl: './entry-instance.component.scss'
+  styleUrl: './entry-instance.component.scss',
 })
-export class EntryInstanceComponent{
-  constructor(private router: Router, private http: HttpClient, private usersService: UsersService, private mediaService: MediaServiceService) {}
+export class EntryInstanceComponent {
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private usersService: UsersService,
+    private mediaService: MediaServiceService
+  ) {}
 
   @Input() data!: Media;
 
@@ -28,32 +33,39 @@ export class EntryInstanceComponent{
 
   async ngOnInit(): Promise<void> {
     if (this.data.privacy === Privacy.Private) {
-      const accessRequests = this.mediaService.getMediaAccessRequests(this.data.id);
+      const accessRequests = this.mediaService.getMediaAccessRequests(
+        this.data.id
+      );
       this.user = await this.usersService.getCurrentUser();
-      accessRequests.pipe(
-        map(accessRequests => accessRequests.find(accessRequest => accessRequest.requester_id.toString() === this.user?.id))
-      ).subscribe(request => {
-        this.showPrivateBanner = !request || request.status === 'pending' || request.status === 'denied';
-      });
-    }
-    else {
+      accessRequests
+        .pipe(
+          map((accessRequests) =>
+            accessRequests.find(
+              (accessRequest) =>
+                accessRequest.requester_id.toString() === this.user?.id
+            )
+          )
+        )
+        .subscribe((request) => {
+          this.showPrivateBanner =
+            !request ||
+            request.status === 'pending' ||
+            request.status === 'denied';
+        });
+    } else {
       this.showPrivateBanner = false;
     }
   }
 
-
   getImageUrl(): string {
-    return (
-    (this.data.photos?.[0]?.thumbnail_url
+    return this.data.photos?.[0]?.thumbnail_url
       ? environment.apiUrl + this.data.photos[0].thumbnail_url
-      : '')
-  );
+      : '';
   }
 
   goToPhoto(): void {
     this.router.navigate(['/home/photo', this.data.id]);
   }
-
 
   async sendRequestAccess(): Promise<void> {
     if (!this.user?.id) {
@@ -61,18 +73,21 @@ export class EntryInstanceComponent{
       return;
     }
     const body = {
-      user_id: this.user.id
+      user_id: this.user.id,
+      justification:
+        'Proszę o dostęp do tej prywatnej fotografii, ponieważ jest ona dla mnie ważna.',
     };
-    console.log("Wysyłane PATCH body:", body);
+    console.log('Wysyłane PATCH body:', body);
 
-    this.http.post(`${environment.apiUrl}/media/access-request/${this.data.id}`, body)
+    this.http
+      .post(`${environment.apiUrl}/media/access-request/${this.data.id}`, body)
       .subscribe({
         next: () => {
           alert('Wysłano prośbę o dostęp');
         },
         error: (err) => {
           alert('Nie udało się wysłać prośby: ' + err.message);
-        }
+        },
       });
   }
 }
