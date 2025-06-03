@@ -1,10 +1,11 @@
 <app-searchbar class="search"></app-searchbar>
 <div class="displayDiv">
-  <ng-container *ngIf="media.length > 0; else elseTemplate">
-    <app-entry-instance *ngFor="let item of media" [data]="item"></app-entry-instance>
-  </ng-container>
-  <ng-template #elseTemplate>
-    <h1>W podanym obszarze nie znaleziono zdjęć</h1>
-  </ng-template>
-
+  <div class="contentDisplay">
+    <ng-container *ngIf="media.length > 0; else elseTemplate">
+      <app-entry-instance *ngFor="let item of media" [data]="item"></app-entry-instance>
+    </ng-container>
+    <ng-template #elseTemplate>
+      <h1>W podanym obszarze nie znaleziono zdjęć</h1>
+    </ng-template>
+  </div>
 </div>

@@ -1,3 +1,6 @@
+// /src/web/src/app/shared/services/media.service.ts
+// Service for media-related API calls, search, upload, and filtering logic.
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
@@ -24,53 +27,139 @@ interface UploadMediaRequest {
 export class MediaServiceService {
   constructor(private http: HttpClient, private userService: UsersService) {}
 
-  currentMedia: Observable<Media[]> | any;
+  // State subjects for search bounds, keywords, filters, and media results
+  private currentBoundsSubject = new BehaviorSubject<{
+    top_left: { lon: number; lat: number };
+    bottom_right: { lon: number; lat: number };
+  }>({ top_left: { lon: 0, lat: 90 }, bottom_right: { lon: 90, lat: 0 } });
+  
+  private currentKeywordsSubject = new BehaviorSubject<string[]>([]);
+  private currentFiltersSubject = new BehaviorSubject<{
+    [key: string]: string;
+  }>({});
+
   private currentMediaSubject = new BehaviorSubject<Media[]>([]);
   public currentMedia$ = this.currentMediaSubject.asObservable();
 
-  search(
-    tl_tuple: any = {
-      lon: 0,
-      lat: 90,
-    },
-    br_tuple: any = {
-      lon: 90,
-      lat: 0,
-    },
-    ids?: string[] | null
-  ): Observable<Media[]> {
-    let body = {
-      location: {
-        top_left: tl_tuple,
-        bottom_right: br_tuple,
-      },
-      phrase: null,
-      creation_date: {
-        year_from: 2010,
-        year_to: 2025,
+  private radiousMediaSubject = new BehaviorSubject<Media[]>([]);
+  public radiousMedia$ = this.radiousMediaSubject.asObservable();
+
+  private currentRadiusSubject = new BehaviorSubject<{
+    center: [number, number];
+    radious: number;
+  } | null>(null);
+
+  // Update search bounds and trigger search
+  searchBounds(tl_tuple: any, br_tuple: any): Observable<Media[]> {
+    console.log('Setting bounds:', tl_tuple, br_tuple);
+    this.currentBoundsSubject.next({
+      top_left: { lon: tl_tuple.lon, lat: tl_tuple.lat },
+      bottom_right: { lon: br_tuple.lon, lat: br_tuple.lat },
+    });
+
+    return this.search();
+  }
+
+  // Update search filters and trigger search
+  searchFilters(keywords: string[], filters: { [key: string]: string }): Observable<Media[]> {
+    this.currentKeywordsSubject.next(keywords);
+    this.currentFiltersSubject.next(filters);
+
+    return this.search();
+  }
+
+  // Perform search with current state and update observables
+  search(): Observable<Media[]> {
+    const { top_left, bottom_right } = this.currentBoundsSubject.value;
+    const keywords = this.currentKeywordsSubject.value;
+    const filters = this.currentFiltersSubject.value;
+
+    const year_from = Math.min(Number(filters['from_year']) || 1, new Date().getFullYear());
+    const year_to = Math.max(Number(filters['to_year']) || 1, new Date().getFullYear());
+
+    // Build request body for backend search
+    const body = {
+      location: { top_left: top_left, bottom_right: bottom_right },
+      phrase: keywords.join(' '),
+      creation_date: { 
+        year_from: year_from, 
+        year_to: year_to 
       },
       page: 0,
       size: 10,
     };
+
+    console.log('Sending search request with body:', body);
 
     const request = this.http.post<Media[]>(
       `${environment.apiUrl}/search`,
       body
     );
 
-    if (ids) {
-      request.subscribe((media) =>
-        this.currentMediaSubject.next(
-          media.filter((m: Media) => ids.includes(m.id.toString()))
-        )
-      );
-    } else {
-      request.subscribe((media) => this.currentMediaSubject.next(media));
-    }
-
+    request.subscribe((media) => {
+      this.currentMediaSubject.next(media);
+      const currentRadius = this.currentRadiusSubject.value;
+      if (currentRadius !== null) {
+        const { center, radious } = currentRadius;
+        this.radiousMediaSubject.next(
+          this.getMediaInCircle(media, center, radious)
+        );
+      } else {
+        this.radiousMediaSubject.next(media);
+      }
+    });
     return request;
   }
 
+  // Filter current media by a circular radius
+  filterByRadious(
+    center: [number, number],
+    radiusMeters: number
+  ): void {
+    this.currentRadiusSubject.next({ center: center, radious: radiusMeters });
+    this.radiousMediaSubject.next(
+      this.getMediaInCircle(
+        this.currentMediaSubject.value,
+        center,
+        radiusMeters
+      )
+    );
+  }
+
+  // Helper: filter media within a circle
+  private getMediaInCircle(
+    source: Media[],
+    center: [number, number],
+    radiusMeters: number
+  ): Media[] {
+    return source.filter((media) => {
+      const coords: [number, number] = [
+        media.location.coordinates.lon,
+        media.location.coordinates.lat,
+      ];
+      const distanceKm = this.getDistanceInKm(center, coords);
+      return distanceKm * 1000 <= radiusMeters;
+    });
+  }
+
+  // Helper: calculate distance between two coordinates in km
+  private getDistanceInKm(a: [number, number], b: [number, number]): number {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const [lon1, lat1] = a;
+    const [lon2, lat2] = b;
+    const R = 6371; // Earth radius in km
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const rLat1 = toRad(lat1);
+    const rLat2 = toRad(lat2);
+    const sinDlat = Math.sin(dLat / 2);
+    const sinDlon = Math.sin(dLon / 2);
+    const h =
+      sinDlat * sinDlat + sinDlon * sinDlon * Math.cos(rLat1) * Math.cos(rLat2);
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+
+  // Upload media with images and metadata
   async uploadMedia(request: UploadMediaRequest): Promise<any> {
     const formData = new FormData();
     request.images.forEach((file) => formData.append('images', file));
@@ -90,6 +179,7 @@ export class MediaServiceService {
     );
   }
 
+  // Get photos belonging to the current user
   async getMyPhotos(): Promise<Media[]> {
     const currentUser = await this.userService.getCurrentUser();
     console.log('Current User ID:', currentUser!.id);
@@ -100,25 +190,27 @@ export class MediaServiceService {
     );
   }
 
+  // Delete a photo by ID
   async deletePhoto(id: string): Promise<any> {
     return await firstValueFrom(
       this.http.delete(`${environment.apiUrl}/media/delete/${id}`)
     );
   }
 
+  // Change privacy of a photo by ID
   async changePhotoPrivacy(id: string, privacy: string): Promise<any> {
     return await firstValueFrom(
       this.http.patch(`${environment.apiUrl}/media/privacy/${id}`, { privacy })
     );
   }
 
+  // Filter current media by a list of IDs
   filterMediaByIds(ids: string[]): void {
     const filtered = this.currentMediaSubject.value.filter((media: Media) =>
       ids.includes(media.id.toString())
     );
     this.currentMediaSubject.next(filtered);
   }
-
 
   getMediaAccessRequests(id: number): Observable<AccessRequest[]> {
     return this.http.get<AccessRequest[]>(`${environment.apiUrl}/media/access-request/${id}`).pipe(
@@ -130,3 +222,4 @@ export class MediaServiceService {
 }
 
 }
+

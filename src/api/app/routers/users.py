@@ -1,6 +1,9 @@
+# /src/api/app/routers/users.py
+# # FastAPI router for user endpoints: ensures user exists in the database.
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from app.services.db.database import get_database
 from app.services.users_service import get_or_create_user
 
@@ -19,7 +22,8 @@ class EnsureUserExistsRequest(BaseModel):
 
 
 @router.post("/ensure_exists")
-def ensure_user_exists(request: EnsureUserExistsRequest, db: AsyncSession = Depends(get_database)):
+def ensure_user_exists(request: EnsureUserExistsRequest, db: Session = Depends(get_database)):
+    # Ensure user exists or create if not present
     user = get_or_create_user(
         db=db,
         id=request.id,
@@ -28,5 +32,4 @@ def ensure_user_exists(request: EnsureUserExistsRequest, db: AsyncSession = Depe
         role=request.role,
         auth_provider=request.auth_provider,
     )
-
     return user

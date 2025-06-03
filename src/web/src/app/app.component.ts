@@ -1,3 +1,6 @@
+// /src/web/src/app/app.component.ts
+// Root Angular component: handles user authentication and ensures user exists in backend.
+
 import { HttpClientModule } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
@@ -22,6 +25,7 @@ export class AppComponent implements OnInit {
   private userService = inject(UsersService);
 
   ngOnInit(): void {
+    // Ensure user exists in the backend after successful authentication
     this.auth.isAuthenticated$
       .pipe(
         filter((isAuthenticated) => isAuthenticated),

@@ -1,17 +1,22 @@
+# /src/api/app/repository/media_repository.py
+# Repository functions for Media, Photo, and Comment models.
+
 import shutil
 import os
 from app.services.db.models import Media, Photo, Comment, CommentPhoto
 from fastapi import UploadFile
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def save_file(file: UploadFile, destination: str):
+    # Save uploaded file to destination
     os.makedirs(os.path.dirname(destination), exist_ok=True)
     with open(destination, "wb") as out_file:
         shutil.copyfileobj(file.file, out_file)
 
 
 def delete_file(filepath: str) -> bool:
+    # Delete file from filesystem
     if os.path.exists(filepath):
         os.remove(filepath)
         return True
@@ -26,6 +31,7 @@ def save_photo_metadata(
     session,
     user_id: int
 ):
+    # Save photo and media metadata to database
     new_media = Media(
         user_id=user_id,
         title=title,
@@ -49,6 +55,7 @@ def save_photo_metadata(
 
 
 def save_new_comment_in_db(media_id: int, user_id: int, comment_txt: str, session):
+    # Save new comment and link to photo
     media = (
         session.query(Media)
         .outerjoin(Photo, Media.id == Photo.media_id)
@@ -66,7 +73,7 @@ def save_new_comment_in_db(media_id: int, user_id: int, comment_txt: str, sessio
         media_id=media_id,
         user_id=user_id,
         content=comment_txt,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
 
     session.add(new_comment)
@@ -86,5 +93,7 @@ def save_new_comment_in_db(media_id: int, user_id: int, comment_txt: str, sessio
 def get_media_comments_from_db(
         media_id: int,
         session):
-    comments = session.query(Comment).filter(Comment.media_id == media_id).all()
+    # Retrieve all comments for a media item
+    comments = session.query(Comment).filter(
+        Comment.media_id == media_id).all()
     return comments

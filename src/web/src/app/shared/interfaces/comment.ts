@@ -1,3 +1,5 @@
+// /src/web/src/app/shared/intefaces/comment.ts
+
 export interface Comment {
   id: Number;
   media_id: Number;

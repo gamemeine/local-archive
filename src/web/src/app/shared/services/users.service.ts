@@ -1,3 +1,6 @@
+// /src/web/src/app/shared/services/users.service.ts
+// Service for user-related API calls and Auth0 integration.
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '@auth0/auth0-angular';
@@ -18,6 +21,7 @@ export interface User {
 export class UsersService {
   constructor(private http: HttpClient, private auth: AuthService) {}
 
+  // Get the current authenticated user from Auth0 and map to backend User shape
   async getCurrentUser(): Promise<User | null> {
     const user = await firstValueFrom(this.auth.user$);
     if (!user) {
@@ -34,7 +38,7 @@ export class UsersService {
     };
   }
 
-
+  // Ensure the user exists in the backend by calling the API
   async ensureUserExists(): Promise<any> {
     const user = await this.getCurrentUser();
     if (!user) {

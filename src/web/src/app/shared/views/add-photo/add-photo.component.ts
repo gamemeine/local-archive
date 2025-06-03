@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MapPickerComponent } from '../../components/map-picker/map-picker.component';
 import { AddressService } from '../../services/address.service';
 import { HttpClientModule } from '@angular/common/http';
@@ -32,6 +32,11 @@ export class AddPhotoComponent implements OnInit {
   currentPhoto = 0;
   address = '';
   selectedCoords?: { lat: number; lng: number };
+
+  title: string = '';
+  description: string = '';
+  isPrivate: boolean = false; // checkbox model
+  creationDate: string = ''; // model for date input
 
   // TODO: replace with real user ID from your auth context
   currentUserId = 'user-123';
@@ -101,15 +106,15 @@ export class AddPhotoComponent implements OnInit {
       return;
     }
     const images = this.imagePath;
-    const title = 'Tytuł zdjęcia';
-    const description = 'Opis zdjęcia';
-    const privacy = 'public'; // or 'private'
-    const content = this.address; // map address or other content
+    const title = this.title || 'No title provided';
+    const description = this.description || 'No description provided';
+    const privacy = this.isPrivate ? 'private' : 'public';
+    const content = this.address;
     const latitude = this.selectedCoords?.lat ?? 0;
     const longitude = this.selectedCoords?.lng ?? 0;
-    const creationDate = '2024-05-17'; // or build dynamically
+    const creationDate = this.creationDate || new Date().toISOString().slice(0, 10);
 
-    try{
+    try {
       const result = await this.mediaService.uploadMedia({
         title,
         description,
@@ -119,7 +124,7 @@ export class AddPhotoComponent implements OnInit {
         longitude,
         creation_date: creationDate,
         images,
-      })
+      });
       this.dialog.open(ApprovalPopupComponent);
       console.log('Upload result:', result);
     } catch (error) {

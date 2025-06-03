@@ -1,12 +1,9 @@
 import { Component } from '@angular/core';
 import { EntryInstanceComponent } from '../entry-instance/entry-instance.component';
-import { MockPhotos } from '../../mocks/mockPhotos';
 import { CommonModule } from '@angular/common';
-import { DataInstance } from '../../interfaces/dataInstance';
 import { SearchbarComponent } from '../searchbar/searchbar.component';
 import { MediaServiceService } from '../../services/media.service';
 import { Media } from '../../interfaces/media';
-import { PhotoServiceService } from '../../services/photo-service.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -18,27 +15,18 @@ import { Subscription } from 'rxjs';
 })
 export class ContentDisplayComponent {
   media: Media[] = [];
-  photos: DataInstance[] = [];
 
   private subscriptions = new Subscription();
 
   constructor(
     private mediaService: MediaServiceService,
-    private photoService: PhotoServiceService
   ) {}
 
   ngOnInit(): void {
     // Subscribe to media
     this.subscriptions.add(
-      this.mediaService.currentMedia$.subscribe((media) => {
+      this.mediaService.radiousMedia$.subscribe((media) => {
         this.media = media;
-      })
-    );
-
-    // Subscribe to photo updates
-    this.subscriptions.add(
-      this.photoService.filteredPhotos$.subscribe((photos) => {
-        this.photos = photos;
       })
     );
   }

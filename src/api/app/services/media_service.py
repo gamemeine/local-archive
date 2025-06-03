@@ -1,3 +1,6 @@
+# /src/api/app/services/media_service.py
+# Service functions for media logic: database, Elasticsearch, and file operations.
+
 import os
 import uuid
 from fastapi import UploadFile
@@ -104,7 +107,8 @@ def add_media(
     db.commit()
 
     def add_metadata(metadata, metadata_type):
-        metadata_instance = PredefinedMetadata(media_id=medium.id, metadata_type=metadata_type)
+        metadata_instance = PredefinedMetadata(
+            media_id=medium.id, metadata_type=metadata_type)
         db.add(metadata_instance)
         db.commit()
         db.refresh(metadata_instance)
@@ -131,8 +135,10 @@ def add_media(
             year_from=creation_date.date_from.year,
             year_to=creation_date.date_to.year
         )),
-        location=ElasticLocation(coordinates=Coordinates(lat=location.latitude, lon=location.longitude)),
-        photos=[ElasticPhoto(id=photo.id, thumbnail_url=photo.thumbnail_url) for photo in photos]
+        location=ElasticLocation(coordinates=Coordinates(
+            lat=location.latitude, lon=location.longitude)),
+        photos=[ElasticPhoto(id=photo.id, thumbnail_url=photo.thumbnail_url)
+                for photo in photos]
     )
 
     es.index(index=settings.elasticsearch_index,
@@ -155,10 +161,12 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
 
     # Delete related comment_photo entries first
     if comment_ids:
-        db.query(CommentPhoto).filter(CommentPhoto.comment_id.in_(comment_ids)).delete(synchronize_session=False)
+        db.query(CommentPhoto).filter(CommentPhoto.comment_id.in_(
+            comment_ids)).delete(synchronize_session=False)
 
     # Delete the comments now that nothing references them
-    db.query(Comment).filter(Comment.id.in_(comment_ids)).delete(synchronize_session=False)
+    db.query(Comment).filter(Comment.id.in_(comment_ids)
+                             ).delete(synchronize_session=False)
 
     metadata_ids = [
         m.id for m in db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id == media_id)
@@ -166,10 +174,13 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
 
     if metadata_ids:
         for model in [PhotoContent, CreationDate, Location]:
-            db.query(model).filter(model.metadata_id.in_(metadata_ids)).delete(synchronize_session=False)
+            db.query(model).filter(model.metadata_id.in_(
+                metadata_ids)).delete(synchronize_session=False)
 
-    db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id == media_id).delete(synchronize_session=False)
-    db.query(Photo).filter(Photo.media_id == media_id).delete(synchronize_session=False)
+    db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id ==
+                                        media_id).delete(synchronize_session=False)
+    db.query(Photo).filter(Photo.media_id == media_id).delete(
+        synchronize_session=False)
     db.delete(medium)
     db.commit()
 
@@ -184,20 +195,24 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
 
 
 def add_comment_to_media(media_id: int, user_id: int, comment_txt: str, db):
+    # Add a new comment to a media item
     return save_new_comment_in_db(media_id, user_id, comment_txt, db)
 
 
 def get_media_comments(media_id: int, db):
+    # Retrieve all comments for a media item
     return get_media_comments_from_db(media_id, db)
 
 
 def delete_image(filename: str) -> bool:
+    # Delete an image file from storage
     filepath = os.path.join(settings.upload_dir, filename)
     res = delete_file(filepath)
     return res
 
 
 def change_media_privacy(db: Session, es: Elasticsearch, media_id: int, privacy: str) -> bool:
+    # Change privacy setting for a media item
     medium = db.query(Media).filter(Media.id == media_id).first()
     if not medium:
         return False

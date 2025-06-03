@@ -4,3 +4,22 @@
   height: calc(100vh - 100px);
   overflow: hidden;
 }
+
+.pane {
+  height: 100%;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.pane.map {
+  flex: 1;
+}
+
+.divider {
+  width: 5px;
+  background-color: rgba(200,200,200,0.8);
+  cursor: col-resize;
+  user-select: none;
+  position: relative;
+  z-index: 10;
+}

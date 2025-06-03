@@ -1,3 +1,6 @@
+# /src/api/app/services/es/query.py
+# Query builder for Elasticsearch search requests.
+
 from .models import SearchLocation, YearRange
 
 
@@ -25,8 +28,10 @@ def get_query(
         range_intersect_with_range = {
             "bool": {
                 "filter": [
-                    {"range": {"creation_date.year_range.year_from": {"lte": creation_date.year_to}}},
-                    {"range": {"creation_date.year_range.year_to": {"gte": creation_date.year_from}}}
+                    {"range": {"creation_date.year_range.year_from": {
+                        "lte": creation_date.year_to}}},
+                    {"range": {"creation_date.year_range.year_to": {
+                        "gte": creation_date.year_from}}}
                 ]
             }
         }

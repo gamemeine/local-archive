@@ -1,14 +1,14 @@
 @import '../../styles/colors.scss';
 
+/* Fill parent pane */
 .parentMap {
-  width: calc(30vw - 5px);
-  border-left: 5px ridge gray;
-  height: calc(100vh - 100px);
-}
-
-.map {
   width: 100%;
   height: 100%;
+}
 
+/* ensure inner map div also stretches */
+#map {
+  width: 100%;
+  height: 100%;
 }
 

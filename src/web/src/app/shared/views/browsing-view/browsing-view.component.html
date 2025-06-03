@@ -1,6 +1,10 @@
 <!-- <app-filter-manager></app-filter-manager> -->
- <div class="appSections">
-  <app-content-display></app-content-display>
-<app-map></app-map>
-
- </div>
+<div class="appSections">
+  <div class="pane content" [style.width.px]="contentWidth">
+    <app-content-display></app-content-display>
+  </div>
+  <div class="divider" (mousedown)="onDragStart($event)"></div>
+  <div class="pane map">
+    <app-map></app-map>
+  </div>
+</div>

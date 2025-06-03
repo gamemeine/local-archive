@@ -1,11 +1,16 @@
-<div class="bar">
-  <input type="text" class="text" [(ngModel)]="searchString" placeholder="🔍 Wyszukaj..." (ngModelChange)="parseSearchString()" [ngClass]="{
-    'faulty':  faultyFilters
-  }"/>
-    <div class="filters">
-    <button>🔍 Szukaj</button>
-    <button (click)="openDialog('filters')">⚙️ Filtry</button>
-    <button (click)="openDialog('range')">📍 Zakres</button>
+<form class="bar" (ngSubmit)="search()">
+  <input
+    name="q"
+    type="text"
+    class="text"
+    [(ngModel)]="searchString"
+    placeholder="🔍 Wyszukaj..."
+    (ngModelChange)="parseSearchString()"
+    [ngClass]="{ 'faulty': faultyFilters }"
+  />
+  <div class="filters">
+    <button type="submit">🔍 Szukaj</button>
+    <button type="button" (click)="openDialog('filters')">⚙️ Filtry</button>
+    <button type="button" (click)="openDialog('range')">📍 Zakres</button>
   </div>
-
-</div>
+</form>

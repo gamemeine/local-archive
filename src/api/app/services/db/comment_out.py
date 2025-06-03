@@ -1,4 +1,7 @@
-from pydantic import BaseModel
+# /src/api/app/services/db/comment_out.py
+# Pydantic model for outputting comment data.
+
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 
@@ -9,5 +12,4 @@ class CommentOut(BaseModel):
     created_at: datetime
     author_name: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
