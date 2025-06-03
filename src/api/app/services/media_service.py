@@ -22,6 +22,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 from typing import List
 
+
 class ImageDescriptor(BaseModel):
     id: str
     file_url: str
@@ -212,6 +213,7 @@ def change_media_privacy(db: Session, es: Elasticsearch, media_id: int, privacy:
         pass
     return True
 
+
 def send_media_access_request(db: Session, es: Elasticsearch, media_id: int, user_id: str, justification: str) -> bool:
     existing_request = db.query(AccessRequest).filter_by(
         media_id=media_id,
@@ -255,6 +257,7 @@ def send_media_access_request(db: Session, es: Elasticsearch, media_id: int, use
         db.rollback()
         return False
 
+
 def get_media_access_request(db: Session, media_id: int) -> List[AccessRequest]:
     return (
         db.query(AccessRequest)
@@ -262,6 +265,7 @@ def get_media_access_request(db: Session, media_id: int) -> List[AccessRequest]:
         .order_by(AccessRequest.created_at.desc())
         .all()
     )
+
 
 def get_incoming_user_access_request(db: Session, user_id: str) -> List[AccessRequest]:
     return (

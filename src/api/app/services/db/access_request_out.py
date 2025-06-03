@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+
 class AccessRequestOut(BaseModel):
     id: int
     media_id: int

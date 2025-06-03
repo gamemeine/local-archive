@@ -146,9 +146,11 @@ def change_privacy(
         raise HTTPException(status_code=404, detail="Media not found")
     return {"message": "Privacy updated"}
 
+
 class AccessRequest(BaseModel):
     user_id: str
     justification: str
+
 
 @router.post("/access-request/{media_id}")
 def send_access_request(
@@ -163,6 +165,7 @@ def send_access_request(
     if not success:
         raise HTTPException(status_code=404, detail="Access request send failed.")
     return {"message": "Access request send"}
+
 
 @router.get("/access-request/{media_id}", response_model=List[AccessRequestOut])
 def get_all_access_requests_for_media(
@@ -188,6 +191,7 @@ def get_all_inocming_access_requests_for_user(
 
 class AccessRequestUpdate(BaseModel):
     status: str
+
 
 @router.patch("/access-request/{request_id}")
 def update_access_request_status(
