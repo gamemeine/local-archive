@@ -3,13 +3,12 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
+import { environment } from '../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AddressService {
-
   constructor(private http: HttpClient) {}
 
   // Reverse geocode coordinates to an address using Mapbox API
@@ -18,4 +17,10 @@ export class AddressService {
     return this.http.get<any>(url);
   }
 
+  getCoordsFromAddress(address: string) {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+      address
+    )}.json?access_token=${environment.mapbox.accessToken}`;
+    return this.http.get<any>(url);
+  }
 }

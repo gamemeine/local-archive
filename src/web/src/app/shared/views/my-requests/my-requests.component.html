@@ -1,0 +1,6 @@
+
+<div class="requests">
+<app-request *ngFor="let request of requests" [data]="request"></app-request>
+<h1 *ngIf="requests.length == 0">Brak próśb o dostęp</h1>
+
+</div>
