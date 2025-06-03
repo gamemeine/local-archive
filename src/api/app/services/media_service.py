@@ -136,7 +136,13 @@ def add_media(
             year_to=creation_date.date_to.year
         )),
         location=ElasticLocation(coordinates=Coordinates(
-            lat=location.latitude, lon=location.longitude)),
+            lat=location.latitude, lon=location.longitude),
+            city=location.city,
+            country=location.country,
+            region=location.region,
+            postal_code=location.postal_code,
+            street=location.street
+        ),
         photos=[ElasticPhoto(id=photo.id, thumbnail_url=photo.thumbnail_url)
                 for photo in photos]
     )

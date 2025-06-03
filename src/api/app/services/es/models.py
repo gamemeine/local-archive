@@ -11,6 +11,11 @@ class Coordinates(BaseModel):
 
 class Location(BaseModel):
     coordinates: Coordinates
+    city: str | None = None
+    country: str | None = None
+    region: str | None = None
+    postal_code: str | None = None
+    street: str | None = None
 
 
 class YearRange(BaseModel):
