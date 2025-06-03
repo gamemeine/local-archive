@@ -5,6 +5,7 @@ class AccessRequestOut(BaseModel):
     id: int
     media_id: int
     requester_id: str
+    justification: str
     status: str
     created_at: datetime
     updated_at: datetime

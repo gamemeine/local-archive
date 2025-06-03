@@ -263,6 +263,15 @@ def get_media_access_request(db: Session, media_id: int) -> List[AccessRequest]:
         .all()
     )
 
+def get_incoming_user_access_request(db: Session, user_id: str) -> List[AccessRequest]:
+    return (
+        db.query(AccessRequest)
+        .join(Media, AccessRequest.media_id == Media.id)
+        .filter(Media.user_id == user_id)
+        .order_by(AccessRequest.created_at.desc())
+        .all()
+    )
+
 
 def change_access_request_status(db: Session, request_id: int, new_status: str) -> bool:
     access_request = db.query(AccessRequest).filter_by(id=request_id).first()

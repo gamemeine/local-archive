@@ -15,7 +15,8 @@ from app.services.media_service import (
     get_media_comments,
     send_media_access_request,
     get_media_access_request,
-    change_access_request_status
+    change_access_request_status,
+    get_incoming_user_access_request
 )
 from app.services.es import get_elasticsearch
 from sqlalchemy.orm import Session
@@ -172,6 +173,18 @@ def get_all_access_requests_for_media(
     if not requests:
         return []
     return requests
+
+
+@router.get("/user-access-requests/{user_id}", response_model=List[AccessRequestOut])
+def get_all_inocming_access_requests_for_user(
+    user_id: str,
+    db=Depends(get_database),
+):
+    requests = get_incoming_user_access_request(db, user_id)
+    if not requests:
+        return []
+    return requests
+
 
 class AccessRequestUpdate(BaseModel):
     status: str
