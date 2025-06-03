@@ -44,6 +44,11 @@ class UploadMediaRequest:
         content: str = Form(...),
         latitude: float = Form(...),
         longitude: float = Form(...),
+        city: str = Form(...),
+        country: str = Form(...),
+        postalCode: str = Form(...),
+        state: str = Form(...),
+        street: str = Form(...),
         creation_date: str = Form(...),
     ):
         self.images = images
@@ -54,6 +59,11 @@ class UploadMediaRequest:
         self.content = content
         self.latitude = latitude
         self.longitude = longitude
+        self.city = city
+        self.country = country
+        self.postalCode = postalCode
+        self.state = state
+        self.street = street
         self.creation_date = creation_date
 
 
@@ -63,7 +73,6 @@ def upload(
     db=Depends(get_database),
     es=Depends(get_elasticsearch)
 ):
-    print(request.__dict__)
     medium = Media(
         user_id=request.user_id,
         title=request.title,
@@ -74,7 +83,12 @@ def upload(
     content = PhotoContent(value=request.content)
     location = Location(
         latitude=request.latitude,
-        longitude=request.longitude
+        longitude=request.longitude,
+        city=request.city,
+        country=request.country,
+        postal_code=request.postalCode,
+        region=request.state,
+        street=request.street,
     )
     creation_date = CreationDate(
         date_from=request.creation_date, date_to=request.creation_date)
