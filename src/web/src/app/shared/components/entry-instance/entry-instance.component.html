@@ -19,10 +19,10 @@
     </div>
   </div>
   <div class="photoDiv">
-    <div class="private" *ngIf="data.privacy === 'private'">
+    <div class="private" *ngIf="showPrivateBanner">
       <h1>To zdjęcie jest prywatne</h1>
-      <button class="askButton">Poproś o dostęp</button>
+      <button class="askButton" (click)="sendRequestAccess()">Poproś o dostęp</button>
     </div>
-    <img [src]="getImageUrl()" alt="{{ data.title || data.description }}" *ngIf="data.privacy !== 'private'"/>
+    <img [src]="getImageUrl()" alt="{{ data.title || data.description }}" *ngIf="!showPrivateBanner"/>
   </div>
 </div>

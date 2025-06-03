@@ -1,3 +1,6 @@
+# /src/api/app/services/es/models.py
+# Pydantic models for Elasticsearch queries and documents.
+
 from pydantic import BaseModel, model_validator
 
 

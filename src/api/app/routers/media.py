@@ -1,15 +1,24 @@
+# /src/api/app/routers/media.py
+# FastAPI router for media endpoints: upload, retrieve, comment, delete, privacy.
+
 from fastapi import HTTPException, APIRouter, UploadFile, File, Depends, Form, Path, Body
 from app.services.db import get_database
 from pydantic import BaseModel
 from app.services.db.models import CreationDate, Location, Media, PhotoContent
 from app.services.db.comment_out import CommentOut
+from app.services.db.access_request_out import AccessRequestOut
+
 from app.services.media_service import (
     add_media,
     change_media_privacy,
     delete_media,
     get_media,
     add_comment_to_media,
-    get_media_comments
+    get_media_comments,
+    send_media_access_request,
+    get_media_access_request,
+    change_access_request_status,
+    get_incoming_user_access_request
 )
 from app.services.es import get_elasticsearch
 from sqlalchemy.orm import Session
@@ -26,9 +35,7 @@ def find(
     media_id: int,
     db=Depends(get_database)
 ):
-    """
-    Get media by ID.
-    """
+    # Get media by ID
     medium = get_media(db, media_id)
     return medium
 
@@ -109,6 +116,7 @@ def add_comment(
     request: AddCommentRequest,
     db: Session = Depends(get_database)
 ):
+    # Add comment to media
     added_comment = add_comment_to_media(
         media_id, request.user_id, request.text, db)
     return {"New comment id": added_comment.id}
@@ -119,6 +127,7 @@ def get_comments(
     media_id: int = Path(...),
     db: Session = Depends(get_database)
 ):
+    # Get all comments for a media item
     comments = get_media_comments(media_id, db)
     return [
         CommentOut(
@@ -138,6 +147,7 @@ def delete(
     db=Depends(get_database),
     es=Depends(get_elasticsearch)
 ):
+    # Delete media by ID
     delete_media(db, es, media_id)
 
 
@@ -148,7 +158,67 @@ def change_privacy(
     db=Depends(get_database),
     es=Depends(get_elasticsearch)
 ):
+    # Change privacy of a media item
     success = change_media_privacy(db, es, media_id, privacy)
     if not success:
         raise HTTPException(status_code=404, detail="Media not found")
     return {"message": "Privacy updated"}
+
+
+class AccessRequest(BaseModel):
+    user_id: str
+    justification: str
+
+
+@router.post("/access-request/{media_id}")
+def send_access_request(
+    media_id: int,
+    request: AccessRequest,
+    db=Depends(get_database),
+    es=Depends(get_elasticsearch)
+):
+    print("ODEBRANE ŻĄDANIE:", request)
+    print("user_id:", request.user_id)
+    success = send_media_access_request(db, es, media_id, request.user_id, request.justification)
+    if not success:
+        raise HTTPException(status_code=404, detail="Access request send failed.")
+    return {"message": "Access request send"}
+
+
+@router.get("/access-request/{media_id}", response_model=List[AccessRequestOut])
+def get_all_access_requests_for_media(
+    media_id: int,
+    db=Depends(get_database),
+):
+    requests = get_media_access_request(db, media_id)
+    if not requests:
+        return []
+    return requests
+
+
+@router.get("/user-access-requests/{user_id}", response_model=List[AccessRequestOut])
+def get_all_inocming_access_requests_for_user(
+    user_id: str,
+    db=Depends(get_database),
+):
+    requests = get_incoming_user_access_request(db, user_id)
+    if not requests:
+        return []
+    return requests
+
+
+class AccessRequestUpdate(BaseModel):
+    status: str
+
+
+@router.patch("/access-request/{request_id}")
+def update_access_request_status(
+    request_id: int = Path(...),
+    update: AccessRequestUpdate = Body(...),
+    db: Session = Depends(get_database)
+):
+    success = change_access_request_status(db, request_id, update.status)
+    if not success:
+        raise HTTPException(status_code=404, detail="Access request not found.")
+
+    return {"message": f"Access request {update.status}."}

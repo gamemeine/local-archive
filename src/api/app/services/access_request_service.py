@@ -1,3 +1,6 @@
+# /src/api/app/services/access_request_service.py
+# Service functions for access request logic: wraps repository functions.
+
 from app.repository.access_request_repository import (
     create_access_request_repo,
     update_access_request_repo,

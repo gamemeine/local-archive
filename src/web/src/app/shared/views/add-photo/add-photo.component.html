@@ -1,6 +1,5 @@
 <div class="addPhoto">
 <div class="addPhotoForm">
-  <!-- <button class="addButton">Dodaj zdjęcie +</button> -->
   <span>
     <h3>Czy znasz dokładną datę utworzenia?</h3>
       <input type="radio" name="addressOption" [value]="true" class="radio" [(ngModel)]="preciseDate"> Tak
@@ -10,7 +9,7 @@
   <ng-container *ngIf="preciseDate; else elseTemplate">
     <span>
       <h3>Data utworzenia:</h3>
-      <input type="date" name="preciseTime" id="dateInput">
+      <input type="date" name="preciseTime" id="dateInput" [(ngModel)]="creationDate">
     </span>
   </ng-container>
   <ng-template #elseTemplate>
@@ -24,15 +23,11 @@
     </span>
   </ng-template>
 
-
   <hr>
   <span>
-
-
     <h3>Czy znasz dokładny adres?</h3>
       <input type="radio" name="locationOption" [value]="true" class="radio" [(ngModel)]="preciseLocation"> Tak
       <input type="radio" name="locationOption" [value]="false" class="radio" [(ngModel)]="preciseLocation"> Nie
-
   </span>
   <hr>
   <span>
@@ -40,8 +35,6 @@
       <h3>Lokalizacja:</h3>
       <app-map-picker (coordinatesSelected)="onCoordsPicked($event)"></app-map-picker>
       <p><b>Wybrana lokalizacja:</b><br>
-        <!-- Szerokość: {{ selectedCoords?.lat | number:'1.4-4' }}<br>
-        Długość: {{ selectedCoords?.lng | number:'1.4-4' }}</p> -->
         {{ address }}</p>
     </ng-container>
     <ng-template #locationTemplate>
@@ -54,17 +47,18 @@
         <h3>Ulica:</h3>
         <input type="text" name="street" id="dateInput">
     </ng-template>
-
   </span>
-  <!-- <hr>
-  <span>
-    <h3>Kod pocztowy:</h3>
-    <input type="text" name="postalCode" id="dateInput">
-  </span> -->
   <hr>
   <span>
-    <h3>Zawartość zdjęcia:</h3>
-    <input type="text" name="content" id="dateInput">
+    <h3>Tytuł zdjęcia:</h3>
+    <input type="text" name="title" id="titleInput" [(ngModel)]="title">
+    <h3>Opis zdjęcia:</h3>
+    <input type="text" name="description" id="descriptionInput" [(ngModel)]="description">
+    <h3>Prywatność:</h3>
+    <label class="privacy-checkbox">
+  Prywatne
+  <input type="checkbox" [(ngModel)]="isPrivate" name="privacyCheckbox">
+</label>
   </span>
   <button class="addPhotoButton" (click)="addPhoto()">Dodaj zdjęcie</button>
 </div>

@@ -1,3 +1,5 @@
+// /src/web/src/app/shared/intefaces/media.ts
+
 import { CreationDate } from './creationDate';
 import { Location } from './location';
 import { Photo } from './photo';

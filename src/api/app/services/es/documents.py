@@ -1,3 +1,6 @@
+# /src/api/app/services/es/documents.py
+# Pydantic models for Elasticsearch documents.
+
 from pydantic import BaseModel
 
 from .models import CreationDate, Location, Photo

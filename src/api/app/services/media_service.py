@@ -1,3 +1,6 @@
+# /src/api/app/services/media_service.py
+# Service functions for media logic: database, Elasticsearch, and file operations.
+
 import os
 import uuid
 from fastapi import UploadFile
@@ -6,7 +9,7 @@ from sqlalchemy.orm import Session, joinedload
 from elasticsearch import Elasticsearch
 from app.config import settings
 from app.services.db.models import (Comment, CommentPhoto, Media, Photo, PhotoContent,
-                                    PredefinedMetadata, Location, CreationDate)
+                                    PredefinedMetadata, Location, CreationDate, AccessRequest)
 from app.repository.media_repository import (save_file, delete_file,
                                              save_new_comment_in_db,
                                              get_media_comments_from_db)
@@ -18,6 +21,9 @@ from app.services.es.models import (
     CreationDate as ElasticCreationDate,
     YearRange
 )
+from sqlalchemy.exc import IntegrityError
+from datetime import datetime
+from typing import List
 
 
 class ImageDescriptor(BaseModel):
@@ -101,7 +107,8 @@ def add_media(
     db.commit()
 
     def add_metadata(metadata, metadata_type):
-        metadata_instance = PredefinedMetadata(media_id=medium.id, metadata_type=metadata_type)
+        metadata_instance = PredefinedMetadata(
+            media_id=medium.id, metadata_type=metadata_type)
         db.add(metadata_instance)
         db.commit()
         db.refresh(metadata_instance)
@@ -128,8 +135,10 @@ def add_media(
             year_from=creation_date.date_from.year,
             year_to=creation_date.date_to.year
         )),
-        location=ElasticLocation(coordinates=Coordinates(lat=location.latitude, lon=location.longitude)),
-        photos=[ElasticPhoto(id=photo.id, thumbnail_url=photo.thumbnail_url) for photo in photos]
+        location=ElasticLocation(coordinates=Coordinates(
+            lat=location.latitude, lon=location.longitude)),
+        photos=[ElasticPhoto(id=photo.id, thumbnail_url=photo.thumbnail_url)
+                for photo in photos]
     )
 
     es.index(index=settings.elasticsearch_index,
@@ -152,10 +161,12 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
 
     # Delete related comment_photo entries first
     if comment_ids:
-        db.query(CommentPhoto).filter(CommentPhoto.comment_id.in_(comment_ids)).delete(synchronize_session=False)
+        db.query(CommentPhoto).filter(CommentPhoto.comment_id.in_(
+            comment_ids)).delete(synchronize_session=False)
 
     # Delete the comments now that nothing references them
-    db.query(Comment).filter(Comment.id.in_(comment_ids)).delete(synchronize_session=False)
+    db.query(Comment).filter(Comment.id.in_(comment_ids)
+                             ).delete(synchronize_session=False)
 
     metadata_ids = [
         m.id for m in db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id == media_id)
@@ -163,10 +174,13 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
 
     if metadata_ids:
         for model in [PhotoContent, CreationDate, Location]:
-            db.query(model).filter(model.metadata_id.in_(metadata_ids)).delete(synchronize_session=False)
+            db.query(model).filter(model.metadata_id.in_(
+                metadata_ids)).delete(synchronize_session=False)
 
-    db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id == media_id).delete(synchronize_session=False)
-    db.query(Photo).filter(Photo.media_id == media_id).delete(synchronize_session=False)
+    db.query(PredefinedMetadata).filter(PredefinedMetadata.media_id ==
+                                        media_id).delete(synchronize_session=False)
+    db.query(Photo).filter(Photo.media_id == media_id).delete(
+        synchronize_session=False)
     db.delete(medium)
     db.commit()
 
@@ -181,20 +195,24 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
 
 
 def add_comment_to_media(media_id: int, user_id: int, comment_txt: str, db):
+    # Add a new comment to a media item
     return save_new_comment_in_db(media_id, user_id, comment_txt, db)
 
 
 def get_media_comments(media_id: int, db):
+    # Retrieve all comments for a media item
     return get_media_comments_from_db(media_id, db)
 
 
 def delete_image(filename: str) -> bool:
+    # Delete an image file from storage
     filepath = os.path.join(settings.upload_dir, filename)
     res = delete_file(filepath)
     return res
 
 
 def change_media_privacy(db: Session, es: Elasticsearch, media_id: int, privacy: str) -> bool:
+    # Change privacy setting for a media item
     medium = db.query(Media).filter(Media.id == media_id).first()
     if not medium:
         return False
@@ -208,4 +226,79 @@ def change_media_privacy(db: Session, es: Elasticsearch, media_id: int, privacy:
         )
     except Exception:
         pass
+    return True
+
+
+def send_media_access_request(db: Session, es: Elasticsearch, media_id: int, user_id: str, justification: str) -> bool:
+    existing_request = db.query(AccessRequest).filter_by(
+        media_id=media_id,
+        requester_id=user_id,
+        status='pending'
+    ).first()
+
+    if existing_request:
+        return False
+
+    new_request = AccessRequest(
+        media_id=media_id,
+        requester_id=user_id,
+        justification=justification,
+        status='pending',
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+
+    try:
+        db.add(new_request)
+        db.commit()
+        db.refresh(new_request)
+
+        es.index(
+            index="access_requests",
+            id=new_request.id,
+            document={
+                "id": new_request.id,
+                "media_id": media_id,
+                "requester_id": user_id,
+                "justification": justification,
+                "status": "pending",
+                "created_at": new_request.created_at.isoformat(),
+                "updated_at": new_request.updated_at.isoformat()
+            }
+        )
+
+        return True
+    except IntegrityError:
+        db.rollback()
+        return False
+
+
+def get_media_access_request(db: Session, media_id: int) -> List[AccessRequest]:
+    return (
+        db.query(AccessRequest)
+        .filter(AccessRequest.media_id == media_id)
+        .order_by(AccessRequest.created_at.desc())
+        .all()
+    )
+
+
+def get_incoming_user_access_request(db: Session, user_id: str) -> List[AccessRequest]:
+    return (
+        db.query(AccessRequest)
+        .join(Media, AccessRequest.media_id == Media.id)
+        .filter(Media.user_id == user_id)
+        .order_by(AccessRequest.created_at.desc())
+        .all()
+    )
+
+
+def change_access_request_status(db: Session, request_id: int, new_status: str) -> bool:
+    access_request = db.query(AccessRequest).filter_by(id=request_id).first()
+    if not access_request:
+        return False
+
+    access_request.status = new_status
+    access_request.updated_at = datetime.utcnow()
+
+    db.commit()
     return True

@@ -1,3 +1,6 @@
+# /src/api/tests/test_access_request_repo.py
+# Tests for AccessRequest repository functions using a temporary PostgreSQL database.
+
 import os
 import pytest
 import sqlalchemy

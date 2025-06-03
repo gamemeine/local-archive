@@ -1,3 +1,6 @@
+# /src/api/tests/test_media_repository.py
+# Tests for media_repository functions: file save/delete, photo metadata, and comments.
+
 import pytest
 from fastapi import UploadFile
 from io import BytesIO
@@ -67,7 +70,8 @@ def test_save_photo_metadata_and_photo_saved():
 def test_save_new_comment_db_success():
     # Arrange
     session = setup_in_memory_db()
-    media = Media(id=1, user_id=1, title="Title", description="", privacy="Public")
+    media = Media(id=1, user_id=1, title="Title",
+                  description="", privacy="Public")
     session.add(media)
     session.commit()
     photo = Photo(
@@ -96,7 +100,8 @@ def test_save_new_comment_db_no_media(session=None):
     session = setup_in_memory_db()
     # Act & Assert
     with pytest.raises(ValueError, match="Media not found"):
-        save_new_comment_in_db(media_id=999, user_id=1, comment_txt="X", session=session)
+        save_new_comment_in_db(media_id=999, user_id=1,
+                               comment_txt="X", session=session)
 
 
 def test_save_new_comment_db_no_photo():
@@ -106,7 +111,8 @@ def test_save_new_comment_db_no_photo():
     session.commit()
     # Act & Assert
     with pytest.raises(ValueError, match='Photo not associated'):
-        save_new_comment_in_db(media_id=1, user_id=1, comment_txt='X', session=session)
+        save_new_comment_in_db(media_id=1, user_id=1,
+                               comment_txt='X', session=session)
 
 
 def test_get_media_comments_from_db_returns_empty():
