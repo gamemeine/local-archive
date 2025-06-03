@@ -212,7 +212,7 @@ def change_media_privacy(db: Session, es: Elasticsearch, media_id: int, privacy:
         pass
     return True
 
-def send_media_access_request(db: Session, es: Elasticsearch, media_id: int, user_id: str) -> bool:
+def send_media_access_request(db: Session, es: Elasticsearch, media_id: int, user_id: str, justification: str) -> bool:
     existing_request = db.query(AccessRequest).filter_by(
         media_id=media_id,
         requester_id=user_id,
@@ -225,6 +225,7 @@ def send_media_access_request(db: Session, es: Elasticsearch, media_id: int, use
     new_request = AccessRequest(
         media_id=media_id,
         requester_id=user_id,
+        justification=justification,
         status='pending',
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
@@ -242,6 +243,7 @@ def send_media_access_request(db: Session, es: Elasticsearch, media_id: int, use
                 "id": new_request.id,
                 "media_id": media_id,
                 "requester_id": user_id,
+                "justification": justification,
                 "status": "pending",
                 "created_at": new_request.created_at.isoformat(),
                 "updated_at": new_request.updated_at.isoformat()

@@ -147,6 +147,7 @@ def change_privacy(
 
 class AccessRequest(BaseModel):
     user_id: str
+    justification: str
 
 @router.post("/access-request/{media_id}")
 def send_access_request(
@@ -157,7 +158,7 @@ def send_access_request(
 ):
     print("ODEBRANE ŻĄDANIE:", request)
     print("user_id:", request.user_id)
-    success = send_media_access_request(db, es, media_id, request.user_id)
+    success = send_media_access_request(db, es, media_id, request.user_id, request.justification)
     if not success:
         raise HTTPException(status_code=404, detail="Access request send failed.")
     return {"message": "Access request send"}
