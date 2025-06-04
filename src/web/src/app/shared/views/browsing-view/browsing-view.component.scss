@@ -3,6 +3,7 @@
   flex-direction: row;
   height: calc(100vh - 100px);
   overflow: hidden;
+  width: 100%;
 }
 
 .pane {
@@ -17,9 +18,13 @@
 
 .divider {
   width: 5px;
-  background-color: rgba(200,200,200,0.8);
+  background-color: rgba(200, 200, 200, 0.8);
   cursor: col-resize;
   user-select: none;
   position: relative;
   z-index: 10;
+}
+
+.content {
+  width: 100%;
 }

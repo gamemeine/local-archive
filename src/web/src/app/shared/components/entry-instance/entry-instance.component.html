@@ -1,5 +1,5 @@
-<div class="entryDiv" (click)="goToPhoto()" style="cursor: pointer;">
-  <div class="dataDiv">
+<div class="entryDiv"  style="cursor: pointer;">
+  <div class="dataDiv" >
     <div class="entry">Rok utworzenia:<br>
       <span>
         {{
@@ -14,14 +14,36 @@
         {{ data.location.coordinates.lat }}, {{ data.location.coordinates.lon }}
       </span>
     </div>
-    <div class="entry">Zawartość zdjęcia:<br>
-      <span>{{ data.title || data.description }}</span>
+    <div class="entry">Tytuł:<br>
+      <span>{{ data.title}}</span>
+    </div >
+    <div class="entry">Opis:<br>
+      <span>{{data.description}}</span>
+    </div >
+    <div class="entry">Miasto:<br>
+      <span *ngIf="data.location.city ">{{ data.location.city }}</span>
+      <span *ngIf="!data.location.city "> - </span>
+
     </div>
+    <div class="entry">Adres:<br>
+      <span *ngIf="data.location.street ">{{ data.location.street }}</span>
+      <span *ngIf="!data.location.street ">-</span>
+
+    </div>
+    <div class="entry">Kod pocztowy:<br>
+      <span *ngIf="data.location.postal_code ">{{ data.location.postal_code }}</span>
+      <span *ngIf="!data.location.postal_code "> - </span>
+
+    </div>
+    <button (click)="goToPhoto()" *ngIf="!showPrivateBanner" class="comments">Komentarze</button>
   </div>
   <div class="photoDiv">
     <div class="private" *ngIf="showPrivateBanner">
       <h1>To zdjęcie jest prywatne</h1>
-      <button class="askButton" (click)="sendRequestAccess()">Poproś o dostęp</button>
+      <button class="askButton" (click)="sendRequestAccess()" *ngIf="!requestStatus">Poproś o dostęp</button>
+      <p *ngIf="requestStatus == 'pending'" class="pending"><b>Prośba oczekuje na decyzję</b></p>
+      <p *ngIf="requestStatus == 'denied'" class="denied"><b>Prośba odrzucona</b></p>
+
     </div>
     <img [src]="getImageUrl()" alt="{{ data.title || data.description }}" *ngIf="!showPrivateBanner"/>
   </div>

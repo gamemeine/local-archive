@@ -11,6 +11,7 @@ import { MyPhotosViewComponent } from './shared/views/my-photos-view/my-photos-v
 import { AddPhotoComponent } from './shared/views/add-photo/add-photo.component';
 import { PhotoDetailViewComponent } from './shared/views/photo-detail-view/photo-detail-view.component';
 import { BrowseMyPhotosViewComponent } from './shared/views/browse-my-photos-view/browse-my-photos-view.component';
+import { MyRequestsComponent } from './shared/views/my-requests/my-requests.component';
 
 export const routes: Routes = [
   { path: '', component: LoginViewComponent, pathMatch: 'full' },
@@ -36,11 +37,15 @@ export const routes: Routes = [
       },
       {
         path: 'add-photos',
-        component: AddPhotoComponent
+        component: AddPhotoComponent,
       },
       {
         path: 'browse-my-photos',
         component: BrowseMyPhotosViewComponent,
+      },
+      {
+        path: 'browse-my-requests',
+        component: MyRequestsComponent,
       },
       {
         path: '**',
@@ -49,5 +54,5 @@ export const routes: Routes = [
     ],
     canActivate: [AuthGuard],
   },
-  { path: '**', component: PageNotFoundComponent, pathMatch: 'full' }
+  { path: '**', component: PageNotFoundComponent, pathMatch: 'full' },
 ];

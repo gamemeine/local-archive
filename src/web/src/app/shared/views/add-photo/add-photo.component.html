@@ -26,7 +26,7 @@
   <hr>
   <span>
     <h3>Czy znasz dokładny adres?</h3>
-      <input type="radio" name="locationOption" [value]="true" class="radio" [(ngModel)]="preciseLocation"> Tak
+      <input type="radio" name="locationOption" [value]="true" class="radio" [(ngModel)]="preciseLocation" (click)="translateAddress()"> Tak
       <input type="radio" name="locationOption" [value]="false" class="radio" [(ngModel)]="preciseLocation"> Nie
   </span>
   <hr>
@@ -39,13 +39,13 @@
     </ng-container>
     <ng-template #locationTemplate>
         <h3>Miasto:</h3>
-        <input type="text" name="town" id="dateInput">
+        <input type="text" name="town" id="dateInput" [(ngModel)]="customAddress.city" (ngModelChange)="translateAddress()">
         <h3>Województwo:</h3>
-        <input type="text" name="state" id="dateInput">
+        <input type="text" name="state" id="dateInput" [(ngModel)]="customAddress.state" (ngModelChange)="translateAddress()">
         <h3>Kod pocztowy:</h3>
-        <input type="text" name="postalCode" id="dateInput">
+        <input type="text" name="postalCode" id="dateInput" [(ngModel)]="customAddress.postalCode" (ngModelChange)="translateAddress()">
         <h3>Ulica:</h3>
-        <input type="text" name="street" id="dateInput">
+        <input type="text" name="street" id="dateInput" [(ngModel)]="customAddress.street" (ngModelChange)="translateAddress()">
     </ng-template>
   </span>
   <hr>

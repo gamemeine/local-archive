@@ -1,0 +1,25 @@
+  <div class="request">
+    <div class="icon">
+      <p>📩</p>
+
+    </div>
+    <div class="data">
+      <h1>{{ data.title }}</h1>
+      <p class="description">
+        <b>Uzasadnienie:</b>
+        <span>{{ data.justification }}</span>
+
+      </p>
+      <p class="status"><b>Status:</b>
+        <span [ngClass]="{'denied': data.status == 'denied',
+          'pending': data.status == 'pending',
+          'accepted': data.status == 'accepted'
+        }">{{ data.status }}</span></p>
+
+    </div>
+    <div class="controls">
+    <button (click)="acceptRequest()" class="accept">Zatwierdź</button>
+    <button (click)="rejectRequest()" class="reject">Odmów</button>
+
+    </div>
+  </div>

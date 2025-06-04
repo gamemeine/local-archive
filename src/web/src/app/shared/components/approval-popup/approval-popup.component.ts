@@ -12,7 +12,10 @@ import { trigger, transition, style, animate } from '@angular/animations';
   styleUrl: './approval-popup.component.scss',
 })
 export class ApprovalPopupComponent implements OnInit {
-  constructor(private dialogRef: DialogRef<ApprovalPopupComponent>, private router: Router) {}
+  constructor(
+    private dialogRef: DialogRef<ApprovalPopupComponent>,
+    private router: Router
+  ) {}
 
   closeDialog() {
     this.dialogRef.close(); // You can also pass data here
@@ -22,7 +25,6 @@ export class ApprovalPopupComponent implements OnInit {
     setTimeout(() => {
       this.router.navigate(['/home']);
       this.closeDialog();
-
     }, 3000);
   }
 }

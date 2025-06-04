@@ -21,4 +21,5 @@ export interface Media {
   photos: Photo[];
   location: Location;
   creation_date: CreationDate;
+  city?: string;
 }

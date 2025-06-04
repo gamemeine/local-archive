@@ -11,13 +11,7 @@ import { MediaServiceService } from '../../services/media.service';
 @Component({
   selector: 'app-add-photo',
   standalone: true,
-  imports: [
-    CommonModule,
-    MapPickerComponent,
-    HttpClientModule,
-    FormsModule,
-    ApprovalPopupComponent,
-  ],
+  imports: [CommonModule, MapPickerComponent, HttpClientModule, FormsModule],
   templateUrl: './add-photo.component.html',
   styleUrl: './add-photo.component.scss',
 })
@@ -41,6 +35,14 @@ export class AddPhotoComponent implements OnInit {
   // TODO: replace with real user ID from your auth context
   currentUserId = 'user-123';
 
+  customAddress = {
+    street: '',
+    city: '',
+    state: '',
+    country: '',
+    postalCode: '',
+  };
+
   constructor(
     private mapboxService: AddressService,
     private mediaService: MediaServiceService,
@@ -52,6 +54,28 @@ export class AddPhotoComponent implements OnInit {
     console.log('AddPhotoComponent initialized');
   }
 
+  parseAddress(address?: string): any {
+    if (!address) {
+      address = this.address;
+    }
+    address = address.trim();
+    let addressComponents: string[] = address.split(',');
+    if (addressComponents.length < 4) {
+      console.warn('Address does not have enough components:', address);
+      return;
+    }
+    let addressDict = {
+      street: addressComponents[0],
+      city: addressComponents[1].trim().split(' ')[1],
+      state: addressComponents[2].trim(),
+      country: addressComponents[3].trim(),
+      postalCode: addressComponents[1].trim().split(' ')[0], // Assuming postal code is the first part of the city
+    };
+    console.log('Parsed address:', addressDict);
+    return addressDict;
+    // this.customAddress = addressDict;
+  }
+
   onCoordsPicked(coords: { lat: number; lng: number }) {
     this.selectedCoords = coords;
     this.mapboxService
@@ -61,6 +85,7 @@ export class AddPhotoComponent implements OnInit {
           res.features.length > 0
             ? res.features[0].place_name
             : 'Address not found';
+        this.customAddress = this.parseAddress(this.address);
       });
   }
 
@@ -102,9 +127,9 @@ export class AddPhotoComponent implements OnInit {
 
   async addPhoto() {
     if (this.imagePath.length === 0) {
-      console.warn('No photo to upload.');
-      return;
+      this.isPrivate = true;
     }
+    this.translateAddress(); // Ensure address is translated before upload
     const images = this.imagePath;
     const title = this.title || 'No title provided';
     const description = this.description || 'No description provided';
@@ -112,7 +137,8 @@ export class AddPhotoComponent implements OnInit {
     const content = this.address;
     const latitude = this.selectedCoords?.lat ?? 0;
     const longitude = this.selectedCoords?.lng ?? 0;
-    const creationDate = this.creationDate || new Date().toISOString().slice(0, 10);
+    const creationDate =
+      this.creationDate || new Date().toISOString().slice(0, 10);
 
     try {
       const result = await this.mediaService.uploadMedia({
@@ -124,6 +150,11 @@ export class AddPhotoComponent implements OnInit {
         longitude,
         creation_date: creationDate,
         images,
+        city: this.customAddress.city,
+        country: this.customAddress.country,
+        postalCode: this.customAddress.postalCode,
+        state: this.customAddress.state,
+        street: this.customAddress.street,
       });
       this.dialog.open(ApprovalPopupComponent);
       console.log('Upload result:', result);
@@ -131,5 +162,31 @@ export class AddPhotoComponent implements OnInit {
       console.error('Error uploading media:', error);
       this.message = 'Error uploading media. Please try again.';
     }
+  }
+
+  translateAddress() {
+    let addressString = '';
+    addressString += this.customAddress.city;
+    addressString += this.customAddress.street
+      ? `, ${this.customAddress.street}`
+      : '';
+    addressString += this.customAddress.state
+      ? `, ${this.customAddress.state}`
+      : '';
+    this.mapboxService.getCoordsFromAddress(addressString).subscribe({
+      next: (res) => {
+        if (res.features.length > 0) {
+          this.selectedCoords = {
+            lat: res.features[0].center[1],
+            lng: res.features[0].center[0],
+          };
+          console.log('Coordinates:', this.selectedCoords);
+          this.address = res.features[0].place_name;
+          this.parseAddress(this.address);
+        } else {
+          this.message = 'Address not found';
+        }
+      },
+    });
   }
 }
