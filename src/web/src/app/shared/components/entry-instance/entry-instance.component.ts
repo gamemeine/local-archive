@@ -10,6 +10,9 @@ import { MediaServiceService } from '../../services/media.service';
 import { map } from 'rxjs';
 import { Privacy } from '../../interfaces/media';
 import { User } from '../../services/users.service';
+import { RequestDialogComponent } from '../request-dialog/request-dialog.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog.d-Dvsbu-0E';
+import { Dialog } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-entry-instance',
@@ -23,12 +26,14 @@ export class EntryInstanceComponent {
     private router: Router,
     private http: HttpClient,
     private usersService: UsersService,
-    private mediaService: MediaServiceService
+    private mediaService: MediaServiceService,
+    private dialog: Dialog
   ) {}
 
   @Input() data!: Media;
 
   showPrivateBanner: boolean = true;
+  requestStatus: string | null = null;
   user: User | null = null;
 
   async ngOnInit(): Promise<void> {
@@ -37,6 +42,12 @@ export class EntryInstanceComponent {
         this.data.id
       );
       this.user = await this.usersService.getCurrentUser();
+      if (this.user && this.user.id == this.data.user_id.toString()) {
+        // If the user is the owner of the media, they can see it regardless of privacy
+        this.showPrivateBanner = false;
+        this.requestStatus = null;
+        return;
+      }
       accessRequests
         .pipe(
           map((accessRequests) =>
@@ -51,6 +62,7 @@ export class EntryInstanceComponent {
             !request ||
             request.status === 'pending' ||
             request.status === 'denied';
+          this.requestStatus = request?.status || null;
         });
     } else {
       this.showPrivateBanner = false;
@@ -68,26 +80,8 @@ export class EntryInstanceComponent {
   }
 
   async sendRequestAccess(): Promise<void> {
-    if (!this.user?.id) {
-      alert('Nie można wysłać prośby – brak użytkownika');
-      return;
-    }
-    const body = {
-      user_id: this.user.id,
-      justification:
-        'Proszę o dostęp do tej prywatnej fotografii, ponieważ jest ona dla mnie ważna.',
-    };
-    console.log('Wysyłane PATCH body:', body);
-
-    this.http
-      .post(`${environment.apiUrl}/media/access-request/${this.data.id}`, body)
-      .subscribe({
-        next: () => {
-          alert('Wysłano prośbę o dostęp');
-        },
-        error: (err) => {
-          alert('Nie udało się wysłać prośby: ' + err.message);
-        },
-      });
+    this.dialog.open(RequestDialogComponent, {
+      data: { mediaID: this.data.id },
+    });
   }
 }

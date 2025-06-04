@@ -14,10 +14,12 @@
   font-size: 1rem;
   border-radius: 15px;
   z-index: 0;
+  position: relative;
 
   .dataDiv {
     flex: 1 1 30%;
     color: rgba(211, 211, 211, 0.8);
+
     span {
       font-weight: bolder;
       color: white;
@@ -27,15 +29,18 @@
 
   .photoDiv {
     flex: 1 1 65%;
-    min-height: 200px;
+    min-height: 300px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+
     img {
-      width: 100%;
+      max-width: 100%;
       height: auto;
       border-radius: 20px;
+      max-height: 500px;
+
     }
   }
 }
@@ -47,11 +52,13 @@
     font-size: 0.9rem;
     padding: 15px;
   }
+
   .entryDiv .dataDiv,
   .entryDiv .photoDiv {
     flex: 1 1 100%;
     width: 100%;
   }
+
   .entryDiv .photoDiv {
     margin-top: 15px;
   }
@@ -80,6 +87,7 @@
   padding: 10px 20px;
   margin: 10px;
   transition: 0.2s;
+
   &:hover {
     box-shadow: 0 0 15px rgb(255, 255, 255);
     cursor: pointer;
@@ -88,4 +96,24 @@
 
 .entry {
   margin-bottom: 20px;
+}
+
+.comments {
+  position: absolute;
+  bottom: 20px;
+  padding: 10px 20px;
+  border: 3px solid gray;
+  color: white;
+  background-color: $darkGray;
+  border-radius: 10px;
+  font-weight: bolder;
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgb(51, 51, 51);
+  }
+}
+
+.denied {
+  color: red;
 }

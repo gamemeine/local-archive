@@ -1,5 +1,5 @@
-<div class="entryDiv" (click)="goToPhoto()" style="cursor: pointer;">
-  <div class="dataDiv">
+<div class="entryDiv"  style="cursor: pointer;">
+  <div class="dataDiv" >
     <div class="entry">Rok utworzenia:<br>
       <span>
         {{
@@ -20,11 +20,15 @@
     <div class="entry">Miasto:<br>
       <!-- <span>{{ data.city }}</span> -->
     </div>
+    <button (click)="goToPhoto()" *ngIf="!showPrivateBanner" class="comments">Komentarze</button>
   </div>
   <div class="photoDiv">
     <div class="private" *ngIf="showPrivateBanner">
       <h1>To zdjęcie jest prywatne</h1>
-      <button class="askButton" (click)="sendRequestAccess()">Poproś o dostęp</button>
+      <button class="askButton" (click)="sendRequestAccess()" *ngIf="!requestStatus">Poproś o dostęp</button>
+      <p *ngIf="requestStatus == 'pending'">Prośba oczekuje na decyzję</p>
+      <p *ngIf="requestStatus == 'denied'" class="denied">Prośba odrzucona</p>
+
     </div>
     <img [src]="getImageUrl()" alt="{{ data.title || data.description }}" *ngIf="!showPrivateBanner"/>
   </div>

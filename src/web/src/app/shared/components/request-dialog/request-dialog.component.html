@@ -1,1 +1,6 @@
-<p>request-dialog works!</p>
+<div class="approval">
+  <h1>Dodaj uzasadnienie prośby:</h1>
+  {{mediaID}}
+  <textarea [(ngModel)]="body.justification"></textarea>
+  <button (click)="sendRequest()">Wyślij</button>
+</div>
