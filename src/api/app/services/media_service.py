@@ -64,7 +64,11 @@ def get_media(db: Session, media_id: int) -> Media:
     """
     media = (
         db.query(Media)
-        .options(joinedload(Media.photo))
+        .options(
+            joinedload(Media.photo),
+            joinedload(Media.metadata_entries).joinedload(
+                PredefinedMetadata.location)
+        )
         .filter(Media.id == media_id)
         .first()
     )

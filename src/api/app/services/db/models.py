@@ -42,6 +42,12 @@ class Media(Base):
 
     photo = relationship("Photo", back_populates="media", uselist=False)
 
+    metadata_entries = relationship(
+        "PredefinedMetadata",
+        primaryjoin="Media.id == PredefinedMetadata.media_id",
+        cascade="all, delete-orphan"
+    )
+
 
 class Photo(Base):
     __tablename__ = 'photo'
@@ -163,6 +169,14 @@ class PredefinedMetadata(Base):
     metadata_type = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    location = relationship(
+        "Location",
+        uselist=False,
+        back_populates="mdata",
+        cascade="all, delete-orphan"
+    )
+
+
 
 class Location(Base):
     __tablename__ = 'locations'
@@ -178,6 +192,8 @@ class Location(Base):
     longitude = Column(DECIMAL(10, 7))
     radius = Column(Float)
     orientation = Column(String(50))
+
+    mdata = relationship("PredefinedMetadata", back_populates="location")
 
 
 class CreationDate(Base):
