@@ -127,8 +127,7 @@ export class AddPhotoComponent implements OnInit {
 
   async addPhoto() {
     if (this.imagePath.length === 0) {
-      console.warn('No photo to upload.');
-      return;
+      this.isPrivate = true;
     }
     this.translateAddress(); // Ensure address is translated before upload
     const images = this.imagePath;

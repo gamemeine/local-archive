@@ -5,13 +5,21 @@
     </div>
     <div class="data">
       <h1>{{ data.title }}</h1>
-      <p class="description">{{ data.justification }}</p>
-      <p class="status">Status: {{ data.status }}</p>
+      <p class="description">
+        <b>Uzasadnienie:</b>
+        <span>{{ data.justification }}</span>
+
+      </p>
+      <p class="status"><b>Status:</b>
+        <span [ngClass]="{'denied': data.status == 'denied',
+          'pending': data.status == 'pending',
+          'accepted': data.status == 'accepted'
+        }">{{ data.status }}</span></p>
 
     </div>
     <div class="controls">
-    <button (click)="acceptRequest()">Zatwierdź</button>
-    <button (click)="rejectRequest()">Odmów</button>
+    <button (click)="acceptRequest()" class="accept">Zatwierdź</button>
+    <button (click)="rejectRequest()" class="reject">Odmów</button>
 
     </div>
   </div>

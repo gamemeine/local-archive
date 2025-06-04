@@ -2,15 +2,17 @@ import { Component } from '@angular/core';
 import { Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-request',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './request.component.html',
   styleUrl: './request.component.scss',
 })
 export class RequestComponent {
   @Input() data: any;
+  @Input() requests: any;
 
   constructor(private http: HttpClient) {}
 
@@ -42,10 +44,10 @@ export class RequestComponent {
       .patch(`${environment.apiUrl}/media/access-request/${this.data.id}`, body)
       .subscribe({
         next: () => {
-          alert('Odrzucono');
+          console.log('Odrzucono');
         },
         error: (err) => {
-          alert('Błąd');
+          console.log('Błąd');
         },
       });
   }

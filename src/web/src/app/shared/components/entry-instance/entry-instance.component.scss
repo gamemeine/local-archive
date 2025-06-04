@@ -19,6 +19,7 @@
   .dataDiv {
     flex: 1 1 30%;
     color: rgba(211, 211, 211, 0.8);
+    margin-bottom: 50px;
 
     span {
       font-weight: bolder;
@@ -116,4 +117,8 @@
 
 .denied {
   color: red;
+}
+
+.pending {
+  color: orange;
 }

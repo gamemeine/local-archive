@@ -7,6 +7,14 @@
   border-radius: 20px;
   justify-content: space-around;
 
+  b,
+  span {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
   div {
     display: flex;
     align-items: center;
@@ -33,6 +41,46 @@
     button {
       padding: 10px 20px;
       width: 200px;
+      border: 3px solid gray;
+      border-radius: 20px;
+      font-weight: bolder;
+
+      &:hover {
+        cursor: pointer;
+
+      }
     }
   }
+}
+
+.reject {
+  background-color: rgb(179, 0, 0);
+
+  color: white;
+
+  &:hover {
+    background-color: rgb(131, 1, 1);
+  }
+}
+
+.accept {
+  background-color: rgb(18, 105, 25);
+  color: white;
+
+  &:hover {
+    background-color: rgb(7, 85, 14);
+
+  }
+}
+
+.accepted {
+  color: green;
+}
+
+.pending {
+  color: orange;
+}
+
+.denied {
+  color: red;
 }
