@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Media } from '../interfaces/media';
 import { UsersService } from './users.service';
-import { Observable, firstValueFrom, BehaviorSubject } from 'rxjs';
+import { Observable, firstValueFrom, BehaviorSubject, Subject } from 'rxjs';
 import { AccessRequest } from '../interfaces/accessRequest';
 import { catchError, of } from 'rxjs';
 
@@ -56,6 +56,8 @@ export class MediaServiceService {
     center: [number, number];
     radious: number;
   } | null>(null);
+
+  public photoUploaded$ = new Subject<void>();
 
   // Update search bounds and trigger search
   searchBounds(tl_tuple: any, br_tuple: any): Observable<Media[]> {
@@ -195,9 +197,11 @@ export class MediaServiceService {
     const currentUser = await this.userService.getCurrentUser();
     formData.append('user_id', currentUser!.id);
 
-    return await firstValueFrom(
+    const result = await firstValueFrom(
       this.http.post(`${environment.apiUrl}/media/upload`, formData)
     );
+    this.photoUploaded$.next();
+    return result;
   }
 
   // Get photos belonging to the current user
@@ -243,4 +247,8 @@ export class MediaServiceService {
         })
       );
   }
-}
+
+  notifyPhotoUploaded() {
+    this.photoUploaded$.next();
+  }
+} // end class

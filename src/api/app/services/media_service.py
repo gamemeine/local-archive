@@ -90,25 +90,31 @@ def add_media(
     Add media to the database and Elasticsearch.
     """
     # Save to database and storage
-    db.add(medium)
-    db.commit()
-    db.refresh(medium)
-
-    photos = []
-    for image_file in images:
-        image = _save_image(image_file)
-        photo = Photo(
-            id=image.id,
-            media_id=medium.id,
-            file_url=image.file_url,
-            thumbnail_url=image.thumbnail_url,
-            storage_provider=image.storage_provider,
-            file_size=image.file_size
-        )
-        db.add(photo)
-        photos.append(photo)
-
-    db.commit()
+    if not images or len(images) == 0:
+        # Force privacy to private if no images
+        medium.privacy = "private"
+        db.add(medium)
+        db.commit()
+        db.refresh(medium)
+        photos = []
+    else:
+        db.add(medium)
+        db.commit()
+        db.refresh(medium)
+        photos = []
+        for image_file in images:
+            image = _save_image(image_file)
+            photo = Photo(
+                id=image.id,
+                media_id=medium.id,
+                file_url=image.file_url,
+                thumbnail_url=image.thumbnail_url,
+                storage_provider=image.storage_provider,
+                file_size=image.file_size
+            )
+            db.add(photo)
+            photos.append(photo)
+        db.commit()
 
     def add_metadata(metadata, metadata_type):
         metadata_instance = PredefinedMetadata(
@@ -163,6 +169,9 @@ def delete_media(db: Session, es: Elasticsearch, media_id: int) -> bool:
     medium = db.query(Media).filter(Media.id == media_id).first()
     if not medium:
         return False
+
+    db.query(AccessRequest).filter(AccessRequest.media_id == media_id).delete()
+    db.commit()
 
     # First, get comment IDs that will be deleted
     comment_ids = [

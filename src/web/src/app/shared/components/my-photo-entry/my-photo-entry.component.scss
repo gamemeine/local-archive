@@ -97,3 +97,24 @@
 
   }
 }
+
+.no-photo-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  width: 100%;
+  background: #222;
+  color: #bbb;
+  font-size: 1.2em;
+  border-radius: 10px;
+  border: 2px dashed #555;
+  text-align: center;
+  flex-direction: column;
+}
+
+.no-photo-icon {
+  font-size: 3em;
+  display: block;
+  margin-top: 10px;
+}

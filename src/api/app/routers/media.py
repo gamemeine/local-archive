@@ -43,7 +43,7 @@ def find(
 class UploadMediaRequest:
     def __init__(
         self,
-        images: list[UploadFile] = File(...),
+        images: list[UploadFile] = File(default=None),
         user_id: str = Form(...),
         title: str = Form(...),
         description: str = Form(...),
@@ -58,7 +58,7 @@ class UploadMediaRequest:
         street: str = Form(default=None),
         creation_date: str = Form(...),
     ):
-        self.images = images
+        self.images = images if images is not None else []
         self.user_id = user_id
         self.title = title
         self.description = description
@@ -222,3 +222,44 @@ def update_access_request_status(
         raise HTTPException(status_code=404, detail="Access request not found.")
 
     return {"message": f"Access request {update.status}."}
+
+
+@router.post("/upload-photo-for-request")
+def upload_photo_for_request(
+    image: UploadFile = File(...),
+    request_id: int = Form(...),
+    db=Depends(get_database),
+    es=Depends(get_elasticsearch)
+):
+    # Find the access request
+    from app.services.db.models import AccessRequest, Media, Photo
+    access_request = db.query(AccessRequest).filter_by(id=request_id).first()
+    if not access_request:
+        raise HTTPException(status_code=404, detail="Access request not found")
+    # Find the media associated with the access request
+    media = db.query(Media).filter_by(id=access_request.media_id).first()
+    if not media:
+        raise HTTPException(status_code=404, detail="Media not found for this request")
+    # Save the photo file
+    from app.repository.media_repository import save_file
+    import os
+    from app.config import settings
+    import uuid
+    image_id = str(uuid.uuid4())
+    filepath = os.path.join(settings.upload_dir, image_id)
+    save_file(image, filepath)
+    # Create Photo record
+    from app.services.db.models import Photo
+    size = os.path.getsize(filepath)
+    photo = Photo(
+        id=image_id,
+        media_id=media.id,
+        file_url=f"/static/uploads/{image_id}",
+        thumbnail_url=f"/static/uploads/{image_id}",
+        storage_provider="LocalStorageProvider",
+        file_size=size
+    )
+    db.add(photo)
+    db.commit()
+    db.refresh(photo)
+    return {"message": "Photo uploaded", "photo_id": photo.id, "media_id": media.id}

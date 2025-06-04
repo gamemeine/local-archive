@@ -1,6 +1,13 @@
 <div class="my-photo-card">
   <div class="my-photo-image">
-    <img [src]="getImageUrl()" alt="{{ data.title }}" />
+    <ng-container *ngIf="getImageUrl(); else noPhoto">
+      <img [src]="getImageUrl()" alt="{{ data.title }}" />
+    </ng-container>
+    <ng-template #noPhoto>
+      <div class="no-photo-info">
+        <span><b>Brak przesłanego pliku</b><br><span class="no-photo-icon">📄</span></span>
+      </div>
+    </ng-template>
   </div>
   <div class="my-photo-info">
     <h3>{{ data.title }}</h3>
@@ -23,7 +30,6 @@
         {{ data.privacy === 'public' ? 'Ustaw jako prywatne' : 'Ustaw jako publiczne' }}
       </button>
 
-      <button class="edit-btn" (click)="onDelete()">Edytuj</button>
       <button class="delete-btn" (click)="onDelete()">🗑 Usuń</button>
 
     </div>

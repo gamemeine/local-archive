@@ -45,6 +45,15 @@
       <p *ngIf="requestStatus == 'denied'" class="denied"><b>Prośba odrzucona</b></p>
 
     </div>
-    <img [src]="getImageUrl()" alt="{{ data.title || data.description }}" *ngIf="!showPrivateBanner"/>
+    <ng-container *ngIf="!showPrivateBanner">
+      <ng-container *ngIf="getImageUrl(); else noPhoto">
+        <img [src]="getImageUrl()" alt="{{ data.title || data.description }}" />
+      </ng-container>
+      <ng-template #noPhoto>
+        <div class="no-photo-info">
+          <span><b>Brak przesłanego pliku</b><br><span class="no-photo-icon">📄</span></span>
+        </div>
+      </ng-template>
+    </ng-container>
   </div>
 </div>

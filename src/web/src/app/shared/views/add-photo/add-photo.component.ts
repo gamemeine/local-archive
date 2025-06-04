@@ -125,11 +125,65 @@ export class AddPhotoComponent implements OnInit {
     };
   }
 
+  translateAddress() {
+    let addressString = '';
+    addressString += this.customAddress.city;
+    addressString += this.customAddress.street ? `, ${this.customAddress.street}` : '';
+    addressString += this.customAddress.state ? `, ${this.customAddress.state}` : '';
+    this.mapboxService.getCoordsFromAddress(addressString).subscribe({
+      next: (res: any) => {
+        if (res.features.length > 0) {
+          this.selectedCoords = {
+            lat: res.features[0].center[1],
+            lng: res.features[0].center[0],
+          };
+          this.address = res.features[0].place_name;
+          this.parseAddress(this.address);
+        } else {
+          this.message = 'Address not found';
+        }
+      },
+      error: () => {
+        this.message = 'Address not found';
+      }
+    });
+  }
+
   async addPhoto() {
-    if (this.imagePath.length === 0) {
-      this.isPrivate = true;
-    }
-    this.translateAddress(); // Ensure address is translated before upload
+    // Await address translation if needed
+    await new Promise<void>((resolve) => {
+      if (
+        this.customAddress.city ||
+        this.customAddress.street ||
+        this.customAddress.state
+      ) {
+        let addressString = '';
+        addressString += this.customAddress.city;
+        addressString += this.customAddress.street
+          ? `, ${this.customAddress.street}`
+          : '';
+        addressString += this.customAddress.state
+          ? `, ${this.customAddress.state}`
+          : '';
+        this.mapboxService.getCoordsFromAddress(addressString).subscribe({
+          next: (res: any) => {
+            if (res.features.length > 0) {
+              this.selectedCoords = {
+                lat: res.features[0].center[1],
+                lng: res.features[0].center[0],
+              };
+              this.address = res.features[0].place_name;
+              this.parseAddress(this.address);
+            }
+            resolve();
+          },
+          error: () => resolve(),
+        });
+      } else {
+        resolve();
+      }
+    });
+
     const images = this.imagePath;
     const title = this.title || 'No title provided';
     const description = this.description || 'No description provided';
@@ -162,31 +216,5 @@ export class AddPhotoComponent implements OnInit {
       console.error('Error uploading media:', error);
       this.message = 'Error uploading media. Please try again.';
     }
-  }
-
-  translateAddress() {
-    let addressString = '';
-    addressString += this.customAddress.city;
-    addressString += this.customAddress.street
-      ? `, ${this.customAddress.street}`
-      : '';
-    addressString += this.customAddress.state
-      ? `, ${this.customAddress.state}`
-      : '';
-    this.mapboxService.getCoordsFromAddress(addressString).subscribe({
-      next: (res) => {
-        if (res.features.length > 0) {
-          this.selectedCoords = {
-            lat: res.features[0].center[1],
-            lng: res.features[0].center[0],
-          };
-          console.log('Coordinates:', this.selectedCoords);
-          this.address = res.features[0].place_name;
-          this.parseAddress(this.address);
-        } else {
-          this.message = 'Address not found';
-        }
-      },
-    });
   }
 }

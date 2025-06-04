@@ -3,6 +3,7 @@ import { MediaServiceService } from '../../services/media.service';
 import { Media, Privacy } from '../../interfaces/media';
 import { CommonModule } from '@angular/common';
 import { MyPhotoEntryComponent } from '../../components/my-photo-entry/my-photo-entry.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-browse-my-photos-view',
@@ -13,6 +14,7 @@ import { MyPhotoEntryComponent } from '../../components/my-photo-entry/my-photo-
 })
 export class BrowseMyPhotosViewComponent implements OnInit {
   myPhotos: Media[] = [];
+  private subscriptions = new Subscription();
 
   constructor(private mediaService: MediaServiceService) {}
 
@@ -20,18 +22,28 @@ export class BrowseMyPhotosViewComponent implements OnInit {
     this.mediaService.getMyPhotos().then((photos) => {
       this.myPhotos = photos;
     });
+    this.subscriptions.add(
+      this.mediaService.photoUploaded$.subscribe(() => {
+        this.mediaService.getMyPhotos().then((photos) => {
+          this.myPhotos = photos;
+        });
+      })
+    );
   }
 
-async onDeletePhoto(id: string) {
-  await this.mediaService.deletePhoto(id);
-  this.myPhotos = this.myPhotos.filter(photo => String(photo.id) !== id);
-}
-
-async onPrivacyChanged(event: {id: string, privacy: string}) {
-  await this.mediaService.changePhotoPrivacy(event.id, event.privacy);
-  const photo = this.myPhotos.find(p => String(p.id) === event.id);
-  if (photo && (event.privacy === 'public' || event.privacy === 'private')) {
-    photo.privacy = event.privacy as Privacy;
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
-}
+
+  async onDeletePhoto(id: string) {
+    await this.mediaService.deletePhoto(id);
+    // Always reload the list from backend to ensure up-to-date state
+    this.myPhotos = await this.mediaService.getMyPhotos();
+  }
+
+  async onPrivacyChanged(event: {id: string, privacy: string}) {
+    await this.mediaService.changePhotoPrivacy(event.id, event.privacy);
+    // Always reload the list from backend to ensure up-to-date state
+    this.myPhotos = await this.mediaService.getMyPhotos();
+  }
 }
