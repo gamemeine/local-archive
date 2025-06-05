@@ -106,7 +106,7 @@ def upload(
 
 
 class AddCommentRequest(BaseModel):
-    user_id: int
+    user_id: str
     text: str
 
 
